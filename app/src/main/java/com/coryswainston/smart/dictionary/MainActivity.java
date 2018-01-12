@@ -6,16 +6,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
@@ -25,31 +24,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import static com.google.android.gms.vision.Frame.ROTATION_90;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textView;
-    private EditText lookup;
-    private TextView definition;
+    private TextView detectedTextView;
+    private EditText searchBar;
+    private TextView definitionView;
 
     private Uri imageUri;
 
@@ -61,66 +55,92 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        textView = (TextView)findViewById(R.id.textView);
-        lookup = (EditText)findViewById(R.id.lookup);
-        definition = (TextView)findViewById(R.id.definition);
+        detectedTextView = (TextView)findViewById(R.id.textView);
+        searchBar = (EditText)findViewById(R.id.lookup);
+        definitionView = (TextView)findViewById(R.id.definition);
+        Button searchButton = (Button)findViewById(R.id.search);
 
-        textView.setMovementMethod(new ScrollingMovementMethod());
-        definition.setMovementMethod(new ScrollingMovementMethod());
+        ScrollingMovementMethod movementMethod = new ScrollingMovementMethod();
+        detectedTextView.setMovementMethod(movementMethod);
+        definitionView.setMovementMethod(movementMethod);
 
-        Button button = (Button)findViewById(R.id.search);
-        button.setOnClickListener(new View.OnClickListener() {
+        searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Editable s = lookup.getText();
-                Log.d("The word is", s.toString().toLowerCase());
-                new CallbackTask().execute("https://od-api.oxforddictionaries.com:443/api/v1/entries/en/" +
+                Editable s = searchBar.getText();
+
+                AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
+                lookupTask.setListener(new OnCompleteListener() {
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onComplete(String result) {
+                        String definitionsList = "";
+                        try {
+                            ParsableJson<Map<String, Object>> json = new ParsableJson<>(result);
+
+                            List<Map<String, Object>> senses = json.getList("results")
+                                    .getObject(0)
+                                    .getList("lexicalEntries")
+                                    .getObject(0)
+                                    .getList("entries")
+                                    .getObject(0)
+                                    .getList("senses")
+                                    .getJson();
+
+                            for (Map<String, Object> sense : senses) {
+                                ParsableJson senseObject = new ParsableJson(sense);
+                                List<String> definitions = senseObject.getListOfObjects("definitions");
+                                String definition = definitions.get(0);
+
+                                int definitionNumber = senses.indexOf(sense) + 1;
+                                definitionsList += String.format("%s. %s%n%n", definitionNumber, definition);
+                            }
+                        } catch (IOException | NullPointerException | IndexOutOfBoundsException e) {
+                            Log.i("MainActivity", "Unable to find word", e);
+                            definitionsList = "No definition found.";
+                        }
+
+                        MainActivity.this.definitionView.setText(definitionsList);
+                    }
+                });
+
+                lookupTask.execute("https://od-api.oxforddictionaries.com:443/api/v1/entries/en/" +
                         s.toString().toLowerCase());
             }
         });
-        lookup.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-//                Log.d("The word is", s.toString().toLowerCase());
-//                new CallbackTask().execute("https://od-api.oxforddictionaries.com:443/api/v1/entries/en/" +
-//                        s.toString().toLowerCase());
-            }
-        });
-
-        if (!hasPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)) {
-            Log.d("permissions", "we don't have em");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET},0);
-        } else {
+        if (checkForPermissions(Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET)) {
             openCamera();
         }
     }
 
-    private boolean hasPermissions(String ... permissions) {
-        for (int i = 0; i < permissions.length; i++) {
-            if (!(ContextCompat.checkSelfPermission(this, permissions[i]) == PackageManager.PERMISSION_GRANTED)) {
-                return false;
+    private boolean checkForPermissions(String ... permissions) {
+        List<String> permissionsToRequest = new ArrayList<>(Arrays.asList(permissions));
+
+        for (Iterator<String> it = permissionsToRequest.iterator(); it.hasNext();) {
+            if (ContextCompat.checkSelfPermission(this, it.next()) == PackageManager.PERMISSION_GRANTED) {
+                it.remove();
             }
         }
-        Log.d("permissions", "we have em all");
-        return true;
+        if (permissionsToRequest.isEmpty()) {
+            return true;
+        }
+        ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(permissions), 0);
+        return false;
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] results) {
         if (requestCode != 0) {
             return;
         }
-        if (results.length > 2 && results[0] == PackageManager.PERMISSION_GRANTED
-                && results[1] == PackageManager.PERMISSION_GRANTED && results[2] == PackageManager.PERMISSION_GRANTED) {
+        if (results.length > 2
+                && results[0] == PackageManager.PERMISSION_GRANTED
+                && results[1] == PackageManager.PERMISSION_GRANTED
+                && results[2] == PackageManager.PERMISSION_GRANTED) {
             openCamera();
         }
     }
@@ -178,8 +198,8 @@ public class MainActivity extends AppCompatActivity {
                 text = text.concat(block.getValue());
             }
 
-            textView.setText(text);
-            textView.setOnTouchListener(new View.OnTouchListener() {
+            detectedTextView.setText(text);
+            detectedTextView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     TextView view = (TextView)v;
@@ -200,90 +220,12 @@ public class MainActivity extends AppCompatActivity {
                         startIndex--;
                     }
 
-                    lookup.setText(text.subSequence(startIndex, endIndex));
+                    searchBar.setText(text.subSequence(startIndex, endIndex));
 
                     return false;
                 }
             });
         }
-    }
-    private class CallbackTask extends AsyncTask<String, Integer, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            try {
-                URL url = new URL(params[0]);
-                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("Accept","application/json");
-                urlConnection.setRequestProperty("app_id", Key.APP_ID);
-                urlConnection.setRequestProperty("app_key", Key.APP_KEY);
-
-                // read the output from the server
-                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder stringBuilder = new StringBuilder();
-
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line + "\n");
-                }
-
-                urlConnection.getInputStream().close();
-
-                return stringBuilder.toString();
-
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                return e.toString();
-            }
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                Map<String, Object> response = mapper.readValue(result, new TypeReference<Map<String, Object>>() {
-                });
-
-                Log.d("Full JSON", response.toString());
-
-                final String TAG = "MAPPING";
-                List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
-                Log.d(TAG, results.toString());
-                Map<String, Object> firstResult = results.get(0);
-                Log.d(TAG, firstResult.toString());
-                List<Map<String, Object>> lexicalEntries = (List<Map<String, Object>>) firstResult.get("lexicalEntries");
-                Log.d(TAG, lexicalEntries.toString());
-                Map<String, Object> firstLexicalEntry = lexicalEntries.get(0);
-                Log.d(TAG, firstLexicalEntry.toString());
-                List<Map<String, Object>> entries = (List<Map<String, Object>>) firstLexicalEntry.get("entries");
-                Log.d(TAG, entries.toString());
-                Map<String, Object> firstEntry = entries.get(0);
-                Log.d(TAG, firstEntry.toString());
-                List<Map<String, Object>> senses = (List<Map<String, Object>>) firstEntry.get("senses");
-                Log.d(TAG, senses.toString());
-                Map<String, Object> firstSense = senses.get(0);
-                Log.d(TAG, firstSense.toString());
-                List<String> definitions = (List<String>) firstSense.get("definitions");
-                Log.d(TAG, definitions.toString());
-
-                result = "";
-                for (String definition : definitions) {
-                    result += (definition + "\n");
-                }
-            }
-            catch (IOException | NullPointerException | IndexOutOfBoundsException e) {
-                Log.i("MainActivity", "Unable to find word", e);
-                result = "No definition found.";
-            }
-
-            MainActivity.this.definition.setText(result);
-        }
-
     }
 }
 
