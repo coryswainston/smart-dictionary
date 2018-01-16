@@ -32,10 +32,10 @@ public class WordGrabber implements View.OnTouchListener {
 
         int endIndex   = offset;
         int startIndex = offset;
-        for (int i = offset; i < text.length() && !breakChars.contains(text.charAt(i)); i++) {
+        for (int i = offset; i < text.length() && Character.isLetterOrDigit(text.charAt(i)); i++) {
             endIndex++;
         }
-        for (int i = offset; i > 1 && !breakChars.contains(text.charAt(i)); i--) {
+        for (int i = offset; i > 0 && Character.isLetterOrDigit(text.charAt(i - 1)); i--) {
             startIndex--;
         }
 
