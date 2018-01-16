@@ -18,11 +18,11 @@ import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
@@ -32,11 +32,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.DEFINITIONS;
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.ENTRIES;
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.LEXICAL_CATEGORY;
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.LEXICAL_ENTRIES;
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.RESULTS;
+import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.SENSES;
 import static com.google.android.gms.vision.Frame.ROTATION_90;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,14 +60,16 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        detectedTextView = (TextView)findViewById(R.id.textView);
-        searchBar = (EditText)findViewById(R.id.lookup);
-        definitionView = (TextView)findViewById(R.id.definition);
-        Button searchButton = (Button)findViewById(R.id.search);
+        detectedTextView = findViewById(R.id.textView);
+        searchBar = findViewById(R.id.lookup);
+        definitionView = findViewById(R.id.definition);
+        Button searchButton = findViewById(R.id.search);
 
         ScrollingMovementMethod movementMethod = new ScrollingMovementMethod();
         detectedTextView.setMovementMethod(movementMethod);
         definitionView.setMovementMethod(movementMethod);
+
+        detectedTextView.setOnTouchListener(new WordGrabber(searchBar));
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -71,30 +78,11 @@ public class MainActivity extends AppCompatActivity {
                 AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
                 lookupTask.setListener(new OnCompleteListener() {
                     @Override
-                    @SuppressWarnings("unchecked")
                     public void onComplete(String result) {
-                        String definitionsList = "";
+                        String definitionsList;
                         try {
-                            ParsableJson<Map<String, Object>> json = new ParsableJson<>(result);
-
-                            List<Map<String, Object>> senses = json.getList("results")
-                                    .getObject(0)
-                                    .getList("lexicalEntries")
-                                    .getObject(0)
-                                    .getList("entries")
-                                    .getObject(0)
-                                    .getList("senses")
-                                    .getJson();
-
-                            for (Map<String, Object> sense : senses) {
-                                ParsableJson senseObject = new ParsableJson(sense);
-                                List<String> definitions = senseObject.getListOfObjects("definitions");
-                                String definition = definitions.get(0);
-
-                                int definitionNumber = senses.indexOf(sense) + 1;
-                                definitionsList += String.format("%s. %s%n%n", definitionNumber, definition);
-                            }
-                        } catch (IOException | NullPointerException | IndexOutOfBoundsException e) {
+                            definitionsList = parseDefinitionsFromJson(result);
+                        } catch (IOException | NullPointerException | IndexOutOfBoundsException | ClassCastException e) {
                             Log.i("MainActivity", "Unable to find word", e);
                             definitionsList = "No definition found.";
                         }
@@ -113,6 +101,40 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.INTERNET)) {
             openCamera();
         }
+    }
+
+    private String parseDefinitionsFromJson(String s) throws IOException,
+            NullPointerException,
+            IndexOutOfBoundsException,
+            ClassCastException {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        ParsableJson<List<Object>> lexicalEntries = new ParsableJson<>(s)
+                .getList(RESULTS)
+                .getObject(0)
+                .getList(LEXICAL_ENTRIES);
+
+        for (ParsableJson<Object> lexicalEntry : lexicalEntries) {
+            Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
+            String lexicalCategory = lexicalEntryMap.get(LEXICAL_CATEGORY);
+            stringBuilder.append(lexicalCategory);
+            stringBuilder.append("\n");
+
+            ParsableJson<List<Object>> senses = lexicalEntry.getList(ENTRIES)
+                    .getObject(0)
+                    .getList(SENSES);
+
+            for (ParsableJson<Object> sense : senses) {
+                List<String> definitions = sense.getList(DEFINITIONS).getAsList(String.class);
+                String definition = definitions.get(0);
+
+                int definitionNumber = senses.get().indexOf(sense.get()) + 1;
+                stringBuilder.append(String.format("%s. %s%n%n", definitionNumber, definition));
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     private boolean checkForPermissions(String ... permissions) {
@@ -142,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
                 && results[1] == PackageManager.PERMISSION_GRANTED
                 && results[2] == PackageManager.PERMISSION_GRANTED) {
             openCamera();
+        } else {
+            Toast.makeText(this, "Unable to obtain permissions.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -149,23 +173,20 @@ public class MainActivity extends AppCompatActivity {
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         try {
-            imageUri = getUri(String.valueOf(new Date().getTime()), ".jpg");
+            File storageDir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            String path = storageDir.getAbsolutePath() + "/smart-dictionary-temp.jpg";
+            File file = new File(path);
+            imageUri = Uri.fromFile(file);
         }
         catch (Exception e) {
             Log.e("MainActivity", "unable to get uri", e);
+            Toast.makeText(this, "Error processing photo.", Toast.LENGTH_SHORT).show();
+            return;
         }
         takePicture.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         startActivityForResult(takePicture, 1);
-    }
-
-    private Uri getUri(String name, String extension) throws IOException {
-        Date date = new Date();
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        String path = storageDir.getAbsolutePath() + "/" + name;
-        File file = new File(path);
-        return Uri.fromFile(file);
     }
 
     private Bitmap getImageFromFile() {
@@ -199,32 +220,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             detectedTextView.setText(text);
-            detectedTextView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    TextView view = (TextView)v;
-                    int offset = view.getOffsetForPosition(event.getX(), event.getY());
-                    CharSequence text = view.getText();
-                    if (offset >= text.length()) {
-                        return false;
-                    }
-
-                    List<Character> breakChars = Arrays.asList(' ', '\n');
-
-                    int endIndex   = offset;
-                    int startIndex = offset;
-                    for (int i = offset; i < text.length() && !breakChars.contains(text.charAt(i)); i++) {
-                        endIndex++;
-                    }
-                    for (int i = offset; i > 1 && !breakChars.contains(text.charAt(i)); i--) {
-                        startIndex--;
-                    }
-
-                    searchBar.setText(text.subSequence(startIndex, endIndex));
-
-                    return false;
-                }
-            });
         }
     }
 }
