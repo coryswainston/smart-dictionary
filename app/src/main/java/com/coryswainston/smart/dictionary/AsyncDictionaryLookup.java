@@ -33,7 +33,8 @@ public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
 
             String line = null;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line + "\n");
+                stringBuilder.append(line);
+                stringBuilder.append('\n');
             }
 
             urlConnection.getInputStream().close();
