@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Smart Dictionary</string>
+    <string name="picture_instructions">Tap to capture text.</string>
+    <string name="word_instructions">Tap on a word to define it.</string>
 </resources>

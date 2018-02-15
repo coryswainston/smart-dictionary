@@ -8,15 +8,14 @@
     android:nestedScrollingEnabled="false"
     tools:context="com.coryswainston.smart.dictionary.MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <SurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@color/lightgrey"
         android:fontFamily="@font/open_sans_light"
         android:isScrollContainer="false"
         android:scrollbars="vertical"
@@ -39,7 +38,7 @@
         android:fontFamily="@font/open_sans"
         android:isScrollContainer="false"
         android:scrollbars="vertical"
-        android:text="Click word for definition"
+        android:text="@string/picture_instructions"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@android:color/black"
         android:textColorLink="@android:color/background_dark"
@@ -64,7 +63,7 @@
         app:layout_constraintEnd_toStartOf="@+id/search"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/surfaceView" />
 
     <Button
         android:id="@+id/search"
@@ -74,12 +73,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
         android:fontFamily="@font/crete_round"
         android:text="search"
         android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/definition"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/surfaceView"
         app:layout_constraintVertical_bias="0.47" />
 
     <TextView
@@ -88,7 +88,7 @@
         android:layout_height="56dp"
         android:background="@color/colorPrimary"
         android:fontFamily="@font/crete_round"
-        android:gravity="bottom"
+        android:gravity="start"
         android:paddingHorizontal="10dp"
         android:paddingVertical="10dp"
         android:text="@string/app_name"
@@ -106,6 +106,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
         android:background="@android:color/white"
         android:fontFamily="b"
         android:onClick="onNewPicture"
@@ -128,5 +129,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/definition" />
+
+    <TextView
+        android:id="@+id/detectionsView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/open_sans"
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/lookup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
 </android.support.constraint.ConstraintLayout>
