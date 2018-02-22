@@ -8,31 +8,13 @@
     android:nestedScrollingEnabled="false"
     tools:context="com.coryswainston.smart.dictionary.MainActivity">
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/open_sans_light"
-        android:isScrollContainer="false"
-        android:scrollbars="vertical"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/lookup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
     <TextView
         android:id="@+id/definition"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/montserrat"
         android:isScrollContainer="false"
@@ -53,19 +35,18 @@
         android:layout_height="48dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
         android:ems="10"
         android:fontFamily="@font/lato"
         android:inputType="textPersonName"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:paddingHorizontal="10dp"
         app:layout_constraintBottom_toTopOf="@+id/definition"
         app:layout_constraintEnd_toStartOf="@+id/search"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/surfaceView" />
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
 
     <Button
         android:id="@+id/search"
@@ -73,7 +54,7 @@
         android:layout_width="126dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
         android:backgroundTint="@color/colorPrimary"
@@ -83,7 +64,7 @@
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toTopOf="@+id/definition"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/surfaceView"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout"
         app:layout_constraintVertical_bias="0.47" />
 
     <TextView
@@ -109,7 +90,7 @@
         android:layout_width="111dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/montserrat"
@@ -134,25 +115,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/definition" />
 
-    <TextView
-        android:id="@+id/detectionsView"
+    <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/rounded_view"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:fontFamily="@font/lato"
-        android:padding="15dp"
-        android:text="TextView"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/lookup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+        <TextView
+            android:id="@+id/detectionsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_view"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:fontFamily="@font/lato"
+            android:padding="15dp"
+            android:text="TextView"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/lookup"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/rounded_surface"
+            android:fontFamily="@font/open_sans_light"
+            android:isScrollContainer="false"
+            android:scrollbars="vertical"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toTopOf="@+id/lookup"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>
