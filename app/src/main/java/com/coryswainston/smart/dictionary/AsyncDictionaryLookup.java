@@ -16,12 +16,16 @@ import javax.net.ssl.HttpsURLConnection;
 public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
 
     private OnCompleteListener listener;
+    private String lang;
 
     @Override
     protected String doInBackground(String... params) {
+        if (lang == null) {
+            lang = "en";
+        }
 
         try {
-            URL url = new URL(params[0]);
+            URL url = new URL("https://od-api.oxforddictionaries.com:443/api/v1/entries/" + lang + "/" + params[0]);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("app_id", Key.APP_ID);
@@ -61,6 +65,14 @@ public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
 
     public void setListener(OnCompleteListener listener) {
         this.listener = listener;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }
 

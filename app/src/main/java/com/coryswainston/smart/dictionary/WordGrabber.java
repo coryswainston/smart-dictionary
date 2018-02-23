@@ -1,5 +1,6 @@
 package com.coryswainston.smart.dictionary;
 
+import android.os.AsyncTask;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -12,10 +13,10 @@ import java.util.List;
  */
 
 public class WordGrabber implements View.OnTouchListener {
-    private TextView tv;
+    private AsyncTask<String, Integer, String> task;
 
-    public WordGrabber(TextView placeResultIn) {
-        tv = placeResultIn;
+    public WordGrabber(AsyncTask<String, Integer, String> sendResultTo) {
+        task = sendResultTo;
     }
 
     @Override
@@ -39,7 +40,9 @@ public class WordGrabber implements View.OnTouchListener {
             startIndex--;
         }
 
-        tv.setText(text.subSequence(startIndex, endIndex).toString());
+        if (task.getStatus() == AsyncTask.Status.PENDING) {
+            task.execute(text.subSequence(startIndex, endIndex).toString().toLowerCase());
+        }
 
         return false;
     }
