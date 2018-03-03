@@ -1,28 +1,24 @@
 package com.coryswainston.smart.dictionary;
 
+import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +29,15 @@ import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.LEXICA
 import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.RESULTS;
 import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.SENSES;
 
-public class DefineActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener {
+public class DefineActivity extends AppCompatActivity
+        implements SettingsFragment.OnFragmentInteractionListener,
+                   DefineFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "DefineActivity";
 
     private TextView detectView;
     private Fragment settingsFragment;
+    private Fragment defineFragment;
 
     private String lang;
 
@@ -47,10 +46,13 @@ public class DefineActivity extends AppCompatActivity implements SettingsFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_define);
 
-        lang = "en";
+        final ImageButton settingsButton = findViewById(R.id.settings_button);
+        final ImageButton backButton = findViewById(R.id.back_button);
+        addTouchAreaToView(settingsButton);
+        addTouchAreaToView(backButton);
 
         AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
-        lookupTask.setLang(lang);
+        lookupTask.setLang("en");
         lookupTask.setListener(new OnCompleteListener() {
             @Override
             public void onComplete(String result) {
@@ -62,7 +64,7 @@ public class DefineActivity extends AppCompatActivity implements SettingsFragmen
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
 
-                detectView.setText(definitionsList);
+                addDefineFragment(definitionsList.toString());
             }
 
             private SpannableStringBuilder parseDefinitionsFromJson(String s) throws IOException,
@@ -117,10 +119,55 @@ public class DefineActivity extends AppCompatActivity implements SettingsFragmen
         detectView.setText(getIntent().getStringExtra("detections"));
     }
 
+    private void addTouchAreaToView(final View v) {
+        final View parent = (View) v.getParent();
+        parent.post(new Runnable() {
+            @Override
+            public void run() {
+                final Rect bounds = new Rect();
+                v.getHitRect(bounds);
+                bounds.top -= 100;
+                bounds.left -= 100;
+                bounds.right += 100;
+                bounds.bottom += 100;
+                parent.setTouchDelegate(new TouchDelegate(bounds, v));
+            }
+        });
+    }
+
     public void onBack(View v) {
         Log.d(TAG, "onBack called");
         onBackPressed();
     }
+
+    public void onDefineClose(View v) {
+        removeDefineFragment();
+    }
+
+    private void addDefineFragment(String definitions) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        defineFragment = DefineFragment.newInstance(definitions);
+
+        if (fragmentManager.findFragmentByTag("define") == null) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                    .add(R.id.define_container, defineFragment, "define")
+                    .commit();
+        }
+    }
+
+    private void removeDefineFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment defFragInView = fragmentManager.findFragmentByTag("define");
+
+        if (defFragInView != null) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                    .remove(defFragInView)
+                    .commit();
+        }
+    }
+
 
     public void onSettingsClick(View v) {
         if (fragmentIsPresent("settings")) {
@@ -138,7 +185,6 @@ public class DefineActivity extends AppCompatActivity implements SettingsFragmen
             switch (selected) {
                 case R.id.english_radio:
                     lang = "en";
-
                     break;
                 case R.id.spanish_radio:
                     lang = "es";

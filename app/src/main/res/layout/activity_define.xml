@@ -35,10 +35,10 @@
 
         <ImageButton
             android:id="@+id/back_button"
-            android:layout_width="16dp"
+            android:layout_width="14dp"
             android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
             android:adjustViewBounds="true"
             android:background="@drawable/back_icon"
             android:cropToPadding="false"
@@ -53,8 +53,8 @@
             android:id="@+id/settings_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/gear_icon"
             android:focusableInTouchMode="true"
             android:focusedByDefault="true"
@@ -78,6 +78,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/define_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="200dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/settings_container">
+
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/settings_container"
