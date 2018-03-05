@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
 
 
 /**
@@ -15,6 +16,8 @@ import android.view.ViewGroup;
 public class SettingsFragment extends Fragment {
 
     private OnFragmentInteractionListener interactionListener;
+
+    private String language;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -25,11 +28,32 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment DefineFragment.
+     */
+    public static SettingsFragment newInstance(String language) {
+        SettingsFragment settingsFragment = new SettingsFragment();
+        settingsFragment.language = language;
+        return settingsFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        RadioGroup radioGroup = v.findViewById(R.id.radioGroup);
+        switch (language) {
+            case "en":
+                radioGroup.check(R.id.english_radio);
+                break;
+            case "es":
+                radioGroup.check(R.id.spanish_radio);
+                break;
+        }
+        return v;
     }
 
     @Override

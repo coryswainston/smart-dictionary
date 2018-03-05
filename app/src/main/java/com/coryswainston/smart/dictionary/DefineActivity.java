@@ -48,7 +48,8 @@ public class DefineActivity extends AppCompatActivity
         setContentView(R.layout.activity_define);
 
         AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
-        lookupTask.setLang("en");
+        lang = "en";
+        lookupTask.setLang(lang);
         lookupTask.setListener(new OnCompleteListener() {
             @Override
             public void onComplete(String result) {
@@ -197,7 +198,7 @@ public class DefineActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         if (!fragmentIsPresent("settings")) {
-            settingsFragment = new SettingsFragment();
+            settingsFragment = SettingsFragment.newInstance(lang);
 
             fragmentManager.beginTransaction()
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
