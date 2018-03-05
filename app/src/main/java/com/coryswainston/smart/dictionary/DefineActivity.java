@@ -11,6 +11,7 @@ import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -45,11 +46,6 @@ public class DefineActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_define);
-
-        final ImageButton settingsButton = findViewById(R.id.settings_button);
-        final ImageButton backButton = findViewById(R.id.back_button);
-        addTouchAreaToView(settingsButton);
-        addTouchAreaToView(backButton);
 
         AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
         lookupTask.setLang("en");
@@ -117,22 +113,6 @@ public class DefineActivity extends AppCompatActivity
         detectView.setMovementMethod(movementMethod);
 
         detectView.setText(getIntent().getStringExtra("detections"));
-    }
-
-    private void addTouchAreaToView(final View v) {
-        final View parent = (View) v.getParent();
-        parent.post(new Runnable() {
-            @Override
-            public void run() {
-                final Rect bounds = new Rect();
-                v.getHitRect(bounds);
-                bounds.top -= 100;
-                bounds.left -= 100;
-                bounds.right += 100;
-                bounds.bottom += 100;
-                parent.setTouchDelegate(new TouchDelegate(bounds, v));
-            }
-        });
     }
 
     public void onBack(View v) {
