@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Button captureButton;
     private boolean surfaceAvailable;
     private String detectedText;
+    private View loadingGif;
 
     private static final String TAG = "MainActivity";
 
@@ -58,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         captureButton = findViewById(R.id.capture_button);
         surfaceView = findViewById(R.id.surfaceView);
+        loadingGif = findViewById(R.id.loading_gif);
+
+        loadingGif.setVisibility(View.GONE);
+
         surfaceAvailable = false;
         surfaceView.getHolder().addCallback(new SurfaceCallback());
 
@@ -82,18 +88,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("surfaceCallback", e.toString());
             }
 
-            View.OnTouchListener captureText = new View.OnTouchListener() {
+            View.OnClickListener captureText = new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
+                public void onClick(View v) {
+
+                    loadingGif.setVisibility(View.VISIBLE);
+
                     Intent intent = new Intent(MainActivity.this, DefineActivity.class);
                     intent.putExtra("detections", detectedText);
                     startActivity(intent);
-
-                    return false;
                 }
             };
-            surfaceView.setOnTouchListener(captureText);
-            captureButton.setOnTouchListener(captureText);
+            surfaceView.setOnClickListener(captureText);
+            captureButton.setOnClickListener(captureText);
 
         }
         @Override
@@ -188,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        loadingGif.setVisibility(View.GONE);
+
         try {
             startCameraSource();
         }

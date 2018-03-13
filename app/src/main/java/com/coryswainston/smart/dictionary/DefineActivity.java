@@ -41,16 +41,15 @@ public class DefineActivity extends AppCompatActivity
     private Fragment defineFragment;
 
     private String lang;
+    private Map<String, String> definitions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_define);
 
-        AsyncDictionaryLookup lookupTask = new AsyncDictionaryLookup();
         lang = "en";
-        lookupTask.setLang(lang);
-        lookupTask.setListener(new OnCompleteListener() {
+        final OnCompleteListener listener = (new OnCompleteListener() {
             @Override
             public void onComplete(String result) {
                 SpannableStringBuilder definitionsList;
@@ -109,7 +108,16 @@ public class DefineActivity extends AppCompatActivity
         });
 
         detectView = findViewById(R.id.detect_view);
-        detectView.setOnTouchListener(new WordGrabber(lookupTask));
+        WordGrabber.Callback callback = new WordGrabber.Callback() {
+            @Override
+            public void callback(String text) {
+                new AsyncDictionaryLookup()
+                        .withLang(lang)
+                        .withListener(listener)
+                        .execute(text);
+            }
+        };
+        detectView.setOnTouchListener(new WordGrabber(callback));
         ScrollingMovementMethod movementMethod = new ScrollingMovementMethod();
         detectView.setMovementMethod(movementMethod);
 
@@ -135,6 +143,8 @@ public class DefineActivity extends AppCompatActivity
                     .add(R.id.define_container, defineFragment, "define")
                     .commit();
         }
+
+        findViewById(R.id.define_container).setClickable(true);
     }
 
     private void removeDefineFragment() {
@@ -147,6 +157,8 @@ public class DefineActivity extends AppCompatActivity
                     .remove(defFragInView)
                     .commit();
         }
+
+        findViewById(R.id.define_container).setClickable(false);
     }
 
 

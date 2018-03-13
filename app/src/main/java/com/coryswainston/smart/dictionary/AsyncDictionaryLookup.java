@@ -59,20 +59,14 @@ public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
         listener.onComplete(result);
     }
 
-    public OnCompleteListener getListener() {
-        return listener;
-    }
-
-    public void setListener(OnCompleteListener listener) {
+    public AsyncDictionaryLookup withListener(OnCompleteListener listener) {
         this.listener = listener;
+        return this;
     }
 
-    public String getLang() {
-        return lang;
-    }
-
-    public void setLang(String lang) {
+    public AsyncDictionaryLookup withLang(String lang) {
         this.lang = lang;
+        return this;
     }
 }
 

@@ -13,10 +13,10 @@ import java.util.List;
  */
 
 public class WordGrabber implements View.OnTouchListener {
-    private AsyncTask<String, Integer, String> task;
+    private Callback callback;
 
-    public WordGrabber(AsyncTask<String, Integer, String> sendResultTo) {
-        task = sendResultTo;
+    public WordGrabber(Callback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -40,10 +40,12 @@ public class WordGrabber implements View.OnTouchListener {
             startIndex--;
         }
 
-        if (task.getStatus() == AsyncTask.Status.PENDING) {
-            task.execute(text.subSequence(startIndex, endIndex).toString().toLowerCase());
-        }
+        callback.callback(text.subSequence(startIndex, endIndex).toString().toLowerCase());
 
         return false;
+    }
+
+    public interface Callback {
+        void callback(String text);
     }
 }
