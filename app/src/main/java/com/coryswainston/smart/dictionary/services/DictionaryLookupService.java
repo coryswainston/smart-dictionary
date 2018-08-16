@@ -23,6 +23,7 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
 
     private static final String BASE_URL = "https://od-api.oxforddictionaries.com:443/api/v1/entries";
     private String language;
+    private String wordToLookup;
 
     private OnCompleteListener listener;
 
@@ -32,8 +33,10 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
             language = LANGUAGE_EN;
         }
 
+        wordToLookup = params[0];
+
         try {
-            URL url = new URL( String.format("%s/%s/%s", BASE_URL, language, params[0]));
+            URL url = new URL( String.format("%s/%s/%s", BASE_URL, language, wordToLookup));
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("app_id", Key.APP_ID);
@@ -64,7 +67,7 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        listener.onComplete(result);
+        listener.onComplete(wordToLookup, result);
     }
 
     public DictionaryLookupService withListener(OnCompleteListener listener) {

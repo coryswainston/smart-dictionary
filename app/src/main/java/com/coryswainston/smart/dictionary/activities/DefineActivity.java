@@ -1,5 +1,6 @@
 package com.coryswainston.smart.dictionary.activities;
 
+import android.content.res.ColorStateList;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -36,8 +38,8 @@ public class DefineActivity extends AppCompatActivity
     private static final int FADE_IN_OUT_TIME = 100;
 
     private TextView detectedWords;
-    private Fragment settingsFragment;
-    private Fragment definitionsFragment;
+    private SettingsFragment settingsFragment;
+    private DefinitionsFragment definitionsFragment;
     private FragmentManager fragmentManager;
 
     private String selectedLanguage;
@@ -52,7 +54,7 @@ public class DefineActivity extends AppCompatActivity
 
         final OnCompleteListener listener = (new OnCompleteListener() {
             @Override
-            public void onComplete(String result) {
+            public void onComplete(String word, String result) {
                 SpannableStringBuilder definitionsList;
                 try {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
@@ -61,7 +63,7 @@ public class DefineActivity extends AppCompatActivity
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
 
-                addDefinitionsFragment(definitionsList.toString());
+                addDefinitionsFragment(word, definitionsList.toString());
             }
         });
 
@@ -81,11 +83,11 @@ public class DefineActivity extends AppCompatActivity
         detectedWords.setText(getIntent().getStringExtra("detections"));
     }
 
-    private void addDefinitionsFragment(String definitions) {
+    private void addDefinitionsFragment(String word, String definitions) {
         removeSettingsFragment();
 
         if (!fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
-            definitionsFragment = DefinitionsFragment.newInstance(definitions);
+            definitionsFragment = DefinitionsFragment.newInstance(word, definitions);
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
                     .add(R.id.define_container, definitionsFragment, TAG_DEFINITIONS_FRAGMENT)
@@ -189,6 +191,13 @@ public class DefineActivity extends AppCompatActivity
         }
 
         removeSettingsFragment();
+    }
+
+    public void toggleWordEdit(View v) {
+        Button b = (Button)v;
+        b.setText("Save");
+
+        definitionsFragment.toggleWordEdit();
     }
 
     /**

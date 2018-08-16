@@ -32,10 +32,6 @@ public class ParsingHelper {
                     .getList(RESULTS)
                     .getObject(0);
 
-            String word = result.getAsMap(String.class, String.class).get("word");
-            stringBuilder.append(word);
-            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, word.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            stringBuilder.append("\n\n");
 
             ParsableJson<List<Object>> lexicalEntries = result.getList(LEXICAL_ENTRIES);
 
@@ -43,7 +39,7 @@ public class ParsingHelper {
                 Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
                 String lexicalCategory = lexicalEntryMap.get(LEXICAL_CATEGORY).toLowerCase();
                 stringBuilder.append(lexicalCategory);
-                stringBuilder.setSpan(new StyleSpan(Typeface.ITALIC), stringBuilder.length() - lexicalCategory.length(),
+                stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), stringBuilder.length() - lexicalCategory.length(),
                         stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 stringBuilder.append("\n");
 

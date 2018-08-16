@@ -5,5 +5,5 @@ package com.coryswainston.smart.dictionary.listeners;
  */
 
 public interface OnCompleteListener {
-    public void onComplete(String result);
+    public void onComplete(String word, String result);
 }
