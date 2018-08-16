@@ -24,6 +24,8 @@ public class DefineActivity extends AppCompatActivity
     private static final String TAG_DEFINITIONS_FRAGMENT = "definitions";
     private static final String TAG_SETTINGS_FRAGMENT = "settings";
 
+    private static final int FADE_IN_OUT_TIME = 100;
+
     private TextView detectedWords;
     private Fragment settingsFragment;
     private Fragment definitionsFragment;
@@ -97,20 +99,20 @@ public class DefineActivity extends AppCompatActivity
 
 
     private void addSettingsFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        removeDefinitionsFragment();
 
         if (!fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
             settingsFragment = SettingsFragment.newInstance(selectedLanguage);
 
             fragmentManager.beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .setCustomAnimations(R.anim.fade_alpha_in, R.anim.fade_alpha_out)
                     .add(R.id.settings_container, settingsFragment, TAG_SETTINGS_FRAGMENT)
                     .commit();
 
             View wrapper = findViewById(R.id.define_wrapper);
             AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
             alphaAnimation.setFillAfter(true);
-            alphaAnimation.setDuration(500);
+            alphaAnimation.setDuration(FADE_IN_OUT_TIME);
             wrapper.startAnimation(alphaAnimation);
         }
     }
@@ -118,14 +120,14 @@ public class DefineActivity extends AppCompatActivity
     private void removeSettingsFragment() {
         if (fragmentIsPresent(TAG_SETTINGS_FRAGMENT) && settingsFragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .setCustomAnimations(R.anim.fade_alpha_in, R.anim.fade_alpha_out)
                     .remove(settingsFragment)
                     .commit();
 
             View wrapper = findViewById(R.id.define_wrapper);
             AlphaAnimation alphaAnimation = new AlphaAnimation(0.5f, 1.0f);
             alphaAnimation.setFillAfter(true);
-            alphaAnimation.setDuration(500);
+            alphaAnimation.setDuration(FADE_IN_OUT_TIME);
             wrapper.startAnimation(alphaAnimation);
         }
     }
