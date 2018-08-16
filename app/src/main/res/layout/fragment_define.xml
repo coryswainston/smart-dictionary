@@ -28,15 +28,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/define_close_button"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/exit_icon"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/define_close_wrapper"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
             android:onClick="onDefineClose"
-            app:layout_constraintEnd_toEndOf="@+id/definition_text"
-            app:layout_constraintTop_toTopOf="@+id/definition_text" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/define_close_button"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/exit_icon"
+                android:onClick="onDefineClose"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>

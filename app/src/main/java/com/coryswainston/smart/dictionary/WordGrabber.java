@@ -1,12 +1,8 @@
 package com.coryswainston.smart.dictionary;
 
-import android.os.AsyncTask;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A touch listener to retrieve individual words from a textView.
@@ -15,6 +11,8 @@ import java.util.List;
 public class WordGrabber implements View.OnTouchListener {
     private Callback callback;
 
+    private MotionEvent down;
+
     public WordGrabber(Callback callback) {
         this.callback = callback;
     }
@@ -22,14 +20,27 @@ public class WordGrabber implements View.OnTouchListener {
     @Override
     @SuppressWarnings("ClickableViewAccessibility")
     public boolean onTouch(View v, MotionEvent event) {
+
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN && down != null) {
+//            down = event;
+            return false;
+        }
+        down = event;
+//        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+//            MotionEvent temp = down;
+//            down = null;
+//            if (Math.abs(temp.getX() - temp.getX()) > 10 ||
+//                    Math.abs(temp.getY() - event.getY()) > 10) {
+//                return false;
+//            }
+//        }
+
         TextView view = (TextView)v;
         int offset = view.getOffsetForPosition(event.getX(), event.getY());
         CharSequence text = view.getText();
         if (offset >= text.length()) {
             return false;
         }
-
-        List<Character> breakChars = Arrays.asList(' ', '\n');
 
         int endIndex   = offset;
         int startIndex = offset;

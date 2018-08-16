@@ -134,6 +134,8 @@ public class DefineActivity extends AppCompatActivity
     }
 
     private void addDefineFragment(String definitions) {
+        removeSettingsFragment();
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         defineFragment = DefineFragment.newInstance(definitions);
 
@@ -198,12 +200,13 @@ public class DefineActivity extends AppCompatActivity
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     .remove(settingsFragment)
                     .commit();
+
+            View wrapper = findViewById(R.id.define_wrapper);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0.5f, 1.0f);
+            alphaAnimation.setFillAfter(true);
+            alphaAnimation.setDuration(500);
+            wrapper.startAnimation(alphaAnimation);
         }
-        View wrapper = findViewById(R.id.define_wrapper);
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0.5f, 1.0f);
-        alphaAnimation.setFillAfter(true);
-        alphaAnimation.setDuration(500);
-        wrapper.startAnimation(alphaAnimation);
     }
 
     private void addSettingsFragment() {
@@ -216,12 +219,13 @@ public class DefineActivity extends AppCompatActivity
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     .add(R.id.settings_container, settingsFragment, "settings")
                     .commit();
+
+            View wrapper = findViewById(R.id.define_wrapper);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
+            alphaAnimation.setFillAfter(true);
+            alphaAnimation.setDuration(500);
+            wrapper.startAnimation(alphaAnimation);
         }
-        View wrapper = findViewById(R.id.define_wrapper);
-        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
-        alphaAnimation.setFillAfter(true);
-        alphaAnimation.setDuration(500);
-        wrapper.startAnimation(alphaAnimation);
     }
 
     private boolean fragmentIsPresent(String tag) {
