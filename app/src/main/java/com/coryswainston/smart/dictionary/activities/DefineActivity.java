@@ -12,7 +12,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.coryswainston.smart.dictionary.services.AsyncDictionaryLookup;
+import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
 import com.coryswainston.smart.dictionary.listeners.OnCompleteListener;
 import com.coryswainston.smart.dictionary.helpers.ParsingException;
@@ -21,14 +21,14 @@ import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
 import com.coryswainston.smart.dictionary.listeners.WordGrabber;
 
+import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
+import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_ES;
+
 public class DefineActivity extends AppCompatActivity
         implements SettingsFragment.OnFragmentInteractionListener,
         DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "DefineActivity";
-
-    private static final String LANGUAGE_EN = "en";
-    private static final String LANGUAGE_ES = "es";
 
     private static final String TAG_DEFINITIONS_FRAGMENT = "definitions";
     private static final String TAG_SETTINGS_FRAGMENT = "settings";
@@ -68,8 +68,8 @@ public class DefineActivity extends AppCompatActivity
         WordGrabber.Callback callback = new WordGrabber.Callback() {
             @Override
             public void callback(String text) {
-                new AsyncDictionaryLookup()
-                        .withLang(selectedLanguage)
+                new DictionaryLookupService()
+                        .withLanguage(selectedLanguage)
                         .withListener(listener)
                         .execute(text);
             }

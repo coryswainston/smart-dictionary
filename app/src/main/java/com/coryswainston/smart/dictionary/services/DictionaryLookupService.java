@@ -16,19 +16,24 @@ import javax.net.ssl.HttpsURLConnection;
  * Much of this is currently copied from their documentation.
  */
 
-public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
+public class DictionaryLookupService extends AsyncTask<String, Integer, String> {
+
+    public static final String LANGUAGE_EN = "en";
+    public static final String LANGUAGE_ES = "es";
+
+    private static final String BASE_URL = "https://od-api.oxforddictionaries.com:443/api/v1/entries";
+    private String language;
 
     private OnCompleteListener listener;
-    private String lang;
 
     @Override
     protected String doInBackground(String... params) {
-        if (lang == null) {
-            lang = "en";
+        if (language == null) {
+            language = LANGUAGE_EN;
         }
 
         try {
-            URL url = new URL("https://od-api.oxforddictionaries.com:443/api/v1/entries/" + lang + "/" + params[0]);
+            URL url = new URL( String.format("%s/%s/%s", BASE_URL, language, params[0]));
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("app_id", Key.APP_ID);
@@ -38,7 +43,7 @@ public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             StringBuilder stringBuilder = new StringBuilder();
 
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
                 stringBuilder.append('\n');
@@ -62,13 +67,13 @@ public class AsyncDictionaryLookup extends AsyncTask<String, Integer, String> {
         listener.onComplete(result);
     }
 
-    public AsyncDictionaryLookup withListener(OnCompleteListener listener) {
+    public DictionaryLookupService withListener(OnCompleteListener listener) {
         this.listener = listener;
         return this;
     }
 
-    public AsyncDictionaryLookup withLang(String lang) {
-        this.lang = lang;
+    public DictionaryLookupService withLanguage(String language) {
+        this.language = language;
         return this;
     }
 }
