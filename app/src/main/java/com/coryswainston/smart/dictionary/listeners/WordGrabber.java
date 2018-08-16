@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.listeners;
 
 import android.view.MotionEvent;
 import android.view.View;

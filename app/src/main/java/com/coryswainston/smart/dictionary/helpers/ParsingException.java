@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.helpers;
 
 /**
  * Exception for when there is an error parsing a JSON response

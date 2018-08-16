@@ -1,6 +1,9 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.services;
 
 import android.os.AsyncTask;
+
+import com.coryswainston.smart.dictionary.listeners.OnCompleteListener;
+import com.coryswainston.smart.dictionary.config.Key;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

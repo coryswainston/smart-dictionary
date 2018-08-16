@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    tools:context="com.coryswainston.smart.dictionary.DefineActivity">
+    tools:context="com.coryswainston.smart.dictionary.activities.DefineActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/define_wrapper"

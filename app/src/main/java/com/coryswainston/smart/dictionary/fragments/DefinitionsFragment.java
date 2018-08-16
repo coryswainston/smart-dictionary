@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.coryswainston.smart.dictionary.R;
 
 
 /**

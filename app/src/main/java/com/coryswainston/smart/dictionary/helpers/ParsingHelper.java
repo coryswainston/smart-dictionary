@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.helpers;
 
 import android.graphics.Typeface;
 import android.text.Spannable;
@@ -8,7 +8,7 @@ import android.text.style.StyleSpan;
 import java.util.List;
 import java.util.Map;
 
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.*;
+import static com.coryswainston.smart.dictionary.config.DictionaryResponseSchema.*;
 
 /**
  * Library for parsing JSON responses

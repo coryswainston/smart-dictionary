@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.activities;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,9 +12,18 @@ import android.view.animation.AlphaAnimation;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.coryswainston.smart.dictionary.services.AsyncDictionaryLookup;
+import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
+import com.coryswainston.smart.dictionary.listeners.OnCompleteListener;
+import com.coryswainston.smart.dictionary.helpers.ParsingException;
+import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
+import com.coryswainston.smart.dictionary.R;
+import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
+import com.coryswainston.smart.dictionary.listeners.WordGrabber;
+
 public class DefineActivity extends AppCompatActivity
         implements SettingsFragment.OnFragmentInteractionListener,
-                   DefinitionsFragment.OnFragmentInteractionListener {
+        DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "DefineActivity";
 

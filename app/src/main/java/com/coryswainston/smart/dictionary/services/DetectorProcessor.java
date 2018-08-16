@@ -1,18 +1,16 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.services;
 
 import android.graphics.Rect;
 import android.util.SparseArray;
 
+import com.coryswainston.smart.dictionary.listeners.OnProcessedListener;
 import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Processes detected text

@@ -1,29 +1,26 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.activities;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coryswainston.smart.dictionary.services.DetectorProcessor;
+import com.coryswainston.smart.dictionary.listeners.OnProcessedListener;
+import com.coryswainston.smart.dictionary.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -40,14 +37,16 @@ import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
-    private Button captureButton;
     private boolean surfaceAvailable;
-    private String detectedText;
+
+    private Button captureButton;
     private View loadingGif;
 
-    private static final String TAG = "MainActivity";
+    private String detectedText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         captureButton = findViewById(R.id.capture_button);
         surfaceView = findViewById(R.id.surfaceView);
         loadingGif = findViewById(R.id.loading_gif);
-
         loadingGif.setVisibility(View.GONE);
 
         surfaceAvailable = false;
@@ -155,12 +153,8 @@ public class MainActivity extends AppCompatActivity {
         }));
 
         if (!recognizer.isOperational()) {
-            Log.w("main", "not operational");
-
+            Log.w(TAG, "not operational");
         }
-
-        int x = surfaceView.getWidth();
-        int y = surfaceView.getHeight();
 
         cameraSource = new CameraSource.Builder(this, recognizer)
                 .setFacing(CAMERA_FACING_BACK)
@@ -168,8 +162,6 @@ public class MainActivity extends AppCompatActivity {
                 .setRequestedPreviewSize(1000, 1200)
                 .setAutoFocusEnabled(true)
                 .build();
-
-
 
         startCameraSource();
     }

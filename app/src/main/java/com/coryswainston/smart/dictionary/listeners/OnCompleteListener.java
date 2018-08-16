@@ -1,6 +1,4 @@
-package com.coryswainston.smart.dictionary;
-
-import java.util.Map;
+package com.coryswainston.smart.dictionary.listeners;
 
 /**
  * An interface to separate an AsyncTask from the activity it's called in.

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:isScrollContainer="false"
     android:nestedScrollingEnabled="false"
-    tools:context="com.coryswainston.smart.dictionary.MainActivity">
+    tools:context="com.coryswainston.smart.dictionary.activities.MainActivity">
 
     <SurfaceView
         android:id="@+id/surfaceView"

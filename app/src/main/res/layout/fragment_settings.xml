@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="com.coryswainston.smart.dictionary.SettingsFragment">
+    tools:context="com.coryswainston.smart.dictionary.fragments.SettingsFragment">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

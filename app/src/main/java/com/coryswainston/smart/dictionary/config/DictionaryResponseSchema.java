@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary;
+package com.coryswainston.smart.dictionary.config;
 
 /**
  * Constants to represent keys in the Dictionary API response.
