@@ -45,7 +45,7 @@ public class DefineActivity extends AppCompatActivity
                 SpannableStringBuilder definitionsList;
                 try {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
-                } catch (Exception e) {
+                } catch (ParsingException e) {
                     Log.i(TAG, "Unable to find word", e);
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
