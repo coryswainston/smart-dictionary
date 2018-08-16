@@ -1,7 +1,6 @@
 package com.coryswainston.smart.dictionary;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
@@ -14,14 +13,14 @@ import android.widget.TextView;
 /**
  * A fragment to hold definitions of words
  */
-public class DefineFragment extends Fragment {
+public class DefinitionsFragment extends Fragment {
 
     private OnFragmentInteractionListener interactionListener;
 
     private TextView definitionView;
     private String definitions;
 
-    public DefineFragment() {
+    public DefinitionsFragment() {
         // Required empty public constructor
     }
 
@@ -29,12 +28,12 @@ public class DefineFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment DefineFragment.
+     * @return A new instance of fragment DefinitionsFragment.
      */
-    public static DefineFragment newInstance(String definitions) {
-        DefineFragment defineFragment = new DefineFragment();
-        defineFragment.definitions = definitions;
-        return defineFragment;
+    public static DefinitionsFragment newInstance(String definitions) {
+        DefinitionsFragment definitionsFragment = new DefinitionsFragment();
+        definitionsFragment.definitions = definitions;
+        return definitionsFragment;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class DefineFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_define, container, false);
+        View v = inflater.inflate(R.layout.fragment_definitions, container, false);
         definitionView = v.findViewById(R.id.definition_text);
         definitionView.setText(definitions);
 

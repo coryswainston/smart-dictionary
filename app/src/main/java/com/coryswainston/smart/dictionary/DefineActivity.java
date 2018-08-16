@@ -1,162 +1,94 @@
 package com.coryswainston.smart.dictionary;
 
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
-import android.text.style.StyleSpan;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.DEFINITIONS;
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.ENTRIES;
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.LEXICAL_CATEGORY;
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.LEXICAL_ENTRIES;
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.RESULTS;
-import static com.coryswainston.smart.dictionary.DictionaryResponseSchema.SENSES;
-
 public class DefineActivity extends AppCompatActivity
         implements SettingsFragment.OnFragmentInteractionListener,
-                   DefineFragment.OnFragmentInteractionListener {
+                   DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "DefineActivity";
 
-    private TextView detectView;
-    private Fragment settingsFragment;
-    private Fragment defineFragment;
+    private static final String LANGUAGE_EN = "en";
+    private static final String LANGUAGE_ES = "es";
 
-    private String lang;
-    private Map<String, String> definitions;
+    private static final String TAG_DEFINITIONS_FRAGMENT = "definitions";
+    private static final String TAG_SETTINGS_FRAGMENT = "settings";
+
+    private TextView detectedWords;
+    private Fragment settingsFragment;
+    private Fragment definitionsFragment;
+    private FragmentManager fragmentManager;
+
+    private String selectedLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_define);
 
-        lang = "en";
+        selectedLanguage = LANGUAGE_EN;
+        fragmentManager = getSupportFragmentManager();
+
         final OnCompleteListener listener = (new OnCompleteListener() {
             @Override
             public void onComplete(String result) {
                 SpannableStringBuilder definitionsList;
                 try {
-                    definitionsList = parseDefinitionsFromJson(result);
-                } catch (IOException | NullPointerException | IndexOutOfBoundsException | ClassCastException e) {
-                    Log.i("MainActivity", "Unable to find word", e);
+                    definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
+                } catch (Exception e) {
+                    Log.i(TAG, "Unable to find word", e);
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
 
-                addDefineFragment(definitionsList.toString());
-            }
-
-            private SpannableStringBuilder parseDefinitionsFromJson(String s) throws IOException,
-                    NullPointerException,
-                    IndexOutOfBoundsException,
-                    ClassCastException {
-
-                SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-
-                ParsableJson<Object> result = new ParsableJson<>(s)
-                        .getList(RESULTS)
-                        .getObject(0);
-
-                String word = result.getAsMap(String.class, String.class).get("word");
-                stringBuilder.append(word);
-                stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, word.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                stringBuilder.append("\n\n");
-
-                ParsableJson<List<Object>> lexicalEntries = result.getList(LEXICAL_ENTRIES);
-
-                for (ParsableJson<Object> lexicalEntry : lexicalEntries) {
-                    Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
-                    String lexicalCategory = lexicalEntryMap.get(LEXICAL_CATEGORY).toLowerCase();
-                    stringBuilder.append(lexicalCategory);
-                    stringBuilder.setSpan(new StyleSpan(Typeface.ITALIC), stringBuilder.length() - lexicalCategory.length(),
-                            stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    stringBuilder.append("\n");
-
-                    ParsableJson<List<Object>> senses = lexicalEntry.getList(ENTRIES)
-                            .getObject(0)
-                            .getList(SENSES);
-
-                    for (ParsableJson<Object> sense : senses) {
-                        List<String> definitions = sense.getList(DEFINITIONS).getAsList(String.class);
-                        String definition = definitions.get(0);
-
-                        int definitionNumber = senses.get().indexOf(sense.get()) + 1;
-                        stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
-                    }
-                    stringBuilder.append('\n');
-                }
-
-                return stringBuilder;
+                addDefinitionsFragment(definitionsList.toString());
             }
         });
 
-        detectView = findViewById(R.id.detect_view);
         WordGrabber.Callback callback = new WordGrabber.Callback() {
             @Override
             public void callback(String text) {
                 new AsyncDictionaryLookup()
-                        .withLang(lang)
+                        .withLang(selectedLanguage)
                         .withListener(listener)
                         .execute(text);
             }
         };
-        detectView.setOnTouchListener(new WordGrabber(callback));
-        ScrollingMovementMethod movementMethod = new ScrollingMovementMethod();
-        detectView.setMovementMethod(movementMethod);
+        detectedWords = findViewById(R.id.detect_view);
+        detectedWords.setOnTouchListener(new WordGrabber(callback));
+        detectedWords.setMovementMethod(new ScrollingMovementMethod());
 
-        detectView.setText(getIntent().getStringExtra("detections"));
+        detectedWords.setText(getIntent().getStringExtra("detections"));
     }
 
-    public void onBack(View v) {
-        Log.d(TAG, "onBack called");
-        onBackPressed();
-    }
-
-    public void onDefineClose(View v) {
-        removeDefineFragment();
-    }
-
-    private void addDefineFragment(String definitions) {
+    private void addDefinitionsFragment(String definitions) {
         removeSettingsFragment();
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        defineFragment = DefineFragment.newInstance(definitions);
-
-        if (fragmentManager.findFragmentByTag("define") == null) {
+        if (!fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
+            definitionsFragment = DefinitionsFragment.newInstance(definitions);
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
-                    .add(R.id.define_container, defineFragment, "define")
+                    .add(R.id.define_container, definitionsFragment, TAG_DEFINITIONS_FRAGMENT)
                     .commit();
         }
 
         findViewById(R.id.define_container).setClickable(true);
     }
 
-    private void removeDefineFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment defFragInView = fragmentManager.findFragmentByTag("define");
-
-        if (defFragInView != null) {
+    private void removeDefinitionsFragment() {
+        if (fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT) && definitionsFragment != null) {
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
-                    .remove(defFragInView)
+                    .remove(definitionsFragment)
                     .commit();
         }
 
@@ -164,38 +96,27 @@ public class DefineActivity extends AppCompatActivity
     }
 
 
-    public void onSettingsClick(View v) {
-        if (fragmentIsPresent("settings")) {
-            removeSettingsFragment();
-        } else {
-            addSettingsFragment();
+    private void addSettingsFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (!fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
+            settingsFragment = SettingsFragment.newInstance(selectedLanguage);
+
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .add(R.id.settings_container, settingsFragment, TAG_SETTINGS_FRAGMENT)
+                    .commit();
+
+            View wrapper = findViewById(R.id.define_wrapper);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
+            alphaAnimation.setFillAfter(true);
+            alphaAnimation.setDuration(500);
+            wrapper.startAnimation(alphaAnimation);
         }
-    }
-
-    public void onSettingsOk(View v) {
-        View fragmentView = settingsFragment.getView();
-        if (fragmentView != null) {
-            RadioGroup langs = findViewById(R.id.radioGroup);
-            int selected = langs.getCheckedRadioButtonId();
-            switch (selected) {
-                case R.id.english_radio:
-                    lang = "en";
-                    break;
-                case R.id.spanish_radio:
-                    lang = "es";
-                    break;
-            }
-        }
-
-        removeSettingsFragment();
-    }
-
-    public void onSettingsCancel(View v) {
-        removeSettingsFragment();
     }
 
     private void removeSettingsFragment() {
-        if (fragmentIsPresent("settings") && settingsFragment != null) {
+        if (fragmentIsPresent(TAG_SETTINGS_FRAGMENT) && settingsFragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     .remove(settingsFragment)
@@ -209,34 +130,60 @@ public class DefineActivity extends AppCompatActivity
         }
     }
 
-    private void addSettingsFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (!fragmentIsPresent("settings")) {
-            settingsFragment = SettingsFragment.newInstance(lang);
-
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    .add(R.id.settings_container, settingsFragment, "settings")
-                    .commit();
-
-            View wrapper = findViewById(R.id.define_wrapper);
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
-            alphaAnimation.setFillAfter(true);
-            alphaAnimation.setDuration(500);
-            wrapper.startAnimation(alphaAnimation);
-        }
-    }
-
     private boolean fragmentIsPresent(String tag) {
-        return getSupportFragmentManager().findFragmentByTag(tag) != null;
+        return fragmentManager.findFragmentByTag(tag) != null;
     }
 
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage());
+    /**
+     * Called when the user hits the back button.
+     */
+    public void onBack(View v) {
+        Log.d(TAG, "onBack called");
+        onBackPressed();
+    }
+
+    /**
+     * Called when the user hits the exit button in the corner.
+     */
+    public void onDefinitionFragmentExit(View v) {
+        removeDefinitionsFragment();
+    }
+
+    /**
+     * Called when the user hits the settings button.
+     */
+    public void onSettingsClick(View v) {
+        if (fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
+            removeSettingsFragment();
+        } else {
+            addSettingsFragment();
         }
+    }
+
+    /**
+     * Called when the user hits the 'ok' button in the settings fragment.
+     */
+    public void onSettingsOk(View v) {
+        if (settingsFragment.getView() != null) {
+            RadioGroup languages = findViewById(R.id.radioGroup);
+
+            switch (languages.getCheckedRadioButtonId()) {
+                case R.id.english_radio:
+                    selectedLanguage = LANGUAGE_EN;
+                    break;
+                case R.id.spanish_radio:
+                    selectedLanguage = LANGUAGE_ES;
+                    break;
+            }
+        }
+
+        removeSettingsFragment();
+    }
+
+    /**
+     * Called when the user hits the 'cancel' button in the settings fragment.
+     */
+    public void onSettingsCancel(View v) {
+        removeSettingsFragment();
     }
 }

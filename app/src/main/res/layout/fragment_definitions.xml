@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.coryswainston.smart.dictionary.DefineFragment">
+    tools:context="com.coryswainston.smart.dictionary.DefinitionsFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -32,7 +32,7 @@
             android:id="@+id/define_close_wrapper"
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:onClick="onDefineClose"
+            android:onClick="onDefinitionFragmentExit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -43,7 +43,7 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginStart="16dp"
                 android:background="@drawable/exit_icon"
-                android:onClick="onDefineClose"
+                android:onClick="onDefinitionFragmentExit"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
         </android.support.constraint.ConstraintLayout>
