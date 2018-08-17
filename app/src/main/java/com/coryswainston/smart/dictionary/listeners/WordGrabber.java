@@ -1,5 +1,6 @@
 package com.coryswainston.smart.dictionary.listeners;
 
+import android.annotation.SuppressLint;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -17,8 +18,10 @@ public class WordGrabber implements View.OnTouchListener {
         this.callback = callback;
     }
 
+
+
     @Override
-    @SuppressWarnings("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility")
     public boolean onTouch(View v, MotionEvent event) {
 
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN && down != null) {

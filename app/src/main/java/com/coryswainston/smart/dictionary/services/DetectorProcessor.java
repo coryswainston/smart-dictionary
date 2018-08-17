@@ -3,7 +3,6 @@ package com.coryswainston.smart.dictionary.services;
 import android.graphics.Rect;
 import android.util.SparseArray;
 
-import com.coryswainston.smart.dictionary.listeners.OnProcessedListener;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
@@ -18,11 +17,11 @@ import java.util.Map;
 
 public class DetectorProcessor implements Detector.Processor<TextBlock> {
 
-    OnProcessedListener listener;
+    private Callback callback;
 
     @Override
     public void release() {
-
+        // empty
     }
 
     @Override
@@ -43,11 +42,15 @@ public class DetectorProcessor implements Detector.Processor<TextBlock> {
             }
         }
 
-        listener.onProcessed(words, sb.toString());
+        callback.callback(words, sb.toString());
     }
 
-    public DetectorProcessor withListener(OnProcessedListener listener) {
-        this.listener = listener;
+    public DetectorProcessor withCallback(Callback callback) {
+        this.callback = callback;
         return this;
+    }
+
+    public interface Callback {
+        void callback(Map<String, Rect> wordCoordinateMap, String detectedText);
     }
 }

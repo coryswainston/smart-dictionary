@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.coryswainston.smart.dictionary.R;
@@ -24,6 +25,7 @@ public class DefinitionsFragment extends Fragment {
     private TextView definitionView;
     private String title;
     private String definitions;
+    private ProgressBar spinner;
 
     public DefinitionsFragment() {
         // Required empty public constructor
@@ -35,9 +37,8 @@ public class DefinitionsFragment extends Fragment {
      *
      * @return A new instance of fragment DefinitionsFragment.
      */
-    public static DefinitionsFragment newInstance(String word, String definitions) {
+    public static DefinitionsFragment newInstance(String word) {
         DefinitionsFragment definitionsFragment = new DefinitionsFragment();
-        definitionsFragment.definitions = definitions;
         definitionsFragment.title = word;
         return definitionsFragment;
     }
@@ -53,13 +54,17 @@ public class DefinitionsFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_definitions, container, false);
         definitionView = v.findViewById(R.id.definition_text);
-        definitionView.setText(definitions);
+        definitionView.setVisibility(View.INVISIBLE);
+        definitionView.setMovementMethod(new ScrollingMovementMethod());
+        spinner = v.findViewById(R.id.definition_progress_gif);
+        if (definitions != null) {
+            populateDefinitionView();
+        }
 
         titleView = v.findViewById(R.id.definition_word_heading);
         titleView.setText(title);
         titleView.setEnabled(false);
 
-        definitionView.setMovementMethod(new ScrollingMovementMethod());
 
         return v;
     }
@@ -94,6 +99,19 @@ public class DefinitionsFragment extends Fragment {
         } else {
             titleView.setEnabled(true);
             titleView.requestFocus();
+        }
+    }
+
+    private void populateDefinitionView() {
+        definitionView.setText(definitions);
+        definitionView.setVisibility(View.VISIBLE);
+        spinner.setVisibility(View.GONE);
+    }
+
+    public void setDefinitions(String definitions) {
+        this.definitions = definitions;
+        if (getView() != null) {
+            populateDefinitionView();
         }
     }
 }

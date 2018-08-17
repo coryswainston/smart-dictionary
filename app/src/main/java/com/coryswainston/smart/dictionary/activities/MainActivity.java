@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.coryswainston.smart.dictionary.services.DetectorProcessor;
-import com.coryswainston.smart.dictionary.listeners.OnProcessedListener;
 import com.coryswainston.smart.dictionary.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         if (!checkForPermissions(Manifest.permission.CAMERA,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.INTERNET)) {
-            Toast.makeText(this, "Unable to obtain permissions.", Toast.LENGTH_SHORT).show();;
+            Toast.makeText(this, "Unable to obtain permissions.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -145,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
     private void setUpCamera() throws IOException, SecurityException {
 
         TextRecognizer recognizer = new TextRecognizer.Builder(getApplicationContext()).build();
-        recognizer.setProcessor(new DetectorProcessor().withListener(new OnProcessedListener() {
+        recognizer.setProcessor(new DetectorProcessor().withCallback(new DetectorProcessor.Callback() {
             @Override
-            public void onProcessed(Map<String, Rect> result, String text) {
-                detectedText = text;
+            public void callback(Map<String, Rect> wordCoordinateMap, String detectedText) {
+                MainActivity.this.detectedText = detectedText;
             }
         }));
 

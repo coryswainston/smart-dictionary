@@ -2,7 +2,6 @@ package com.coryswainston.smart.dictionary.services;
 
 import android.os.AsyncTask;
 
-import com.coryswainston.smart.dictionary.listeners.OnCompleteListener;
 import com.coryswainston.smart.dictionary.config.Key;
 
 import java.io.BufferedReader;
@@ -25,7 +24,7 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
     private String language;
     private String wordToLookup;
 
-    private OnCompleteListener listener;
+    private Callback callback;
 
     @Override
     protected String doInBackground(String... params) {
@@ -67,17 +66,21 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        listener.onComplete(wordToLookup, result);
+        callback.callback(wordToLookup, result);
     }
 
-    public DictionaryLookupService withListener(OnCompleteListener listener) {
-        this.listener = listener;
+    public DictionaryLookupService withCallback(Callback callback) {
+        this.callback = callback;
         return this;
     }
 
     public DictionaryLookupService withLanguage(String language) {
         this.language = language;
         return this;
+    }
+
+    public interface Callback {
+        void callback(String word, String definitions);
     }
 }
 

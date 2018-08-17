@@ -1,7 +1,7 @@
 package com.coryswainston.smart.dictionary.activities;
 
-import android.content.res.ColorStateList;
-import android.support.v4.app.Fragment;
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
-import com.coryswainston.smart.dictionary.listeners.OnCompleteListener;
 import com.coryswainston.smart.dictionary.helpers.ParsingException;
 import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
 import com.coryswainston.smart.dictionary.R;
@@ -41,6 +40,7 @@ public class DefineActivity extends AppCompatActivity
     private SettingsFragment settingsFragment;
     private DefinitionsFragment definitionsFragment;
     private FragmentManager fragmentManager;
+    private SharedPreferences sharedPreferences;
 
     private String selectedLanguage;
 
@@ -51,10 +51,11 @@ public class DefineActivity extends AppCompatActivity
 
         selectedLanguage = LANGUAGE_EN;
         fragmentManager = getSupportFragmentManager();
+        sharedPreferences = getSharedPreferences("lexiglass", 0);
 
-        final OnCompleteListener listener = (new OnCompleteListener() {
+        final DictionaryLookupService.Callback dictionaryCallback = (new DictionaryLookupService.Callback() {
             @Override
-            public void onComplete(String word, String result) {
+            public void callback(String word, String result) {
                 SpannableStringBuilder definitionsList;
                 try {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
@@ -63,31 +64,42 @@ public class DefineActivity extends AppCompatActivity
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
 
-                addDefinitionsFragment(word, definitionsList.toString());
+                sharedPreferences.edit().putString(word, result).apply();
+                definitionsFragment.setDefinitions(definitionsList.toString());
             }
         });
 
-        WordGrabber.Callback callback = new WordGrabber.Callback() {
+        detectedWords = findViewById(R.id.detect_view);
+        detectedWords.setMovementMethod(new ScrollingMovementMethod());
+        detectedWords.setOnTouchListener(new WordGrabber(new WordGrabber.Callback() {
             @Override
             public void callback(String text) {
-                new DictionaryLookupService()
-                        .withLanguage(selectedLanguage)
-                        .withListener(listener)
-                        .execute(text);
+                if (fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
+                    return;
+                }
+                addDefinitionsFragment(text);
+                String cachedDefinition = sharedPreferences.getString(text, null);
+                if (cachedDefinition != null) {
+                    Log.d(TAG, "avoiding API call");
+                    dictionaryCallback.callback(text, cachedDefinition);
+                } else {
+                    Log.d(TAG, "making API call");
+                    new DictionaryLookupService()
+                            .withLanguage(selectedLanguage)
+                            .withCallback(dictionaryCallback)
+                            .execute(text);
+                }
             }
-        };
-        detectedWords = findViewById(R.id.detect_view);
-        detectedWords.setOnTouchListener(new WordGrabber(callback));
-        detectedWords.setMovementMethod(new ScrollingMovementMethod());
+        }));
 
         detectedWords.setText(getIntent().getStringExtra("detections"));
     }
 
-    private void addDefinitionsFragment(String word, String definitions) {
+    private void addDefinitionsFragment(String word) {
         removeSettingsFragment();
 
         if (!fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
-            definitionsFragment = DefinitionsFragment.newInstance(word, definitions);
+            definitionsFragment = DefinitionsFragment.newInstance(word);
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
                     .add(R.id.define_container, definitionsFragment, TAG_DEFINITIONS_FRAGMENT)
