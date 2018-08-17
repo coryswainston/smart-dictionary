@@ -65,7 +65,7 @@ public class DefineActivity extends AppCompatActivity
                 }
 
                 sharedPreferences.edit().putString(word, result).apply();
-                definitionsFragment.setDefinitions(definitionsList.toString());
+                definitionsFragment.setDefinitions(definitionsList);
             }
         });
 

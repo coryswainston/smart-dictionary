@@ -3,6 +3,8 @@ package com.coryswainston.smart.dictionary.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +26,7 @@ public class DefinitionsFragment extends Fragment {
     private EditText titleView;
     private TextView definitionView;
     private String title;
-    private String definitions;
+    private SpannableStringBuilder definitions;
     private ProgressBar spinner;
 
     public DefinitionsFragment() {
@@ -108,7 +110,7 @@ public class DefinitionsFragment extends Fragment {
         spinner.setVisibility(View.GONE);
     }
 
-    public void setDefinitions(String definitions) {
+    public void setDefinitions(SpannableStringBuilder definitions) {
         this.definitions = definitions;
         if (getView() != null) {
             populateDefinitionView();
