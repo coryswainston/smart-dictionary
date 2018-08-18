@@ -97,7 +97,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:background="@drawable/rounded_button"
-                android:backgroundTint="@color/colorPrimary"
                 android:fontFamily="@font/montserrat"
                 android:minHeight="0dp"
                 android:minWidth="0dp"

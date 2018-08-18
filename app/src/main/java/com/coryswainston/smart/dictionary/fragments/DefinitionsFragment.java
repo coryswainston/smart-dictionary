@@ -95,13 +95,21 @@ public class DefinitionsFragment extends Fragment {
         // nothing for now
     }
 
-    public void toggleWordEdit() {
+    public String toggleWordEdit() {
         if (titleView.isEnabled()) {
             titleView.setEnabled(false);
+            String oldTitle = title;
+            title = titleView.getText().toString();
+            if (!title.equals(oldTitle)) {
+                spinner.setVisibility(View.VISIBLE);
+                definitionView.setVisibility(View.INVISIBLE);
+            }
         } else {
             titleView.setEnabled(true);
             titleView.requestFocus();
         }
+
+        return title;
     }
 
     private void populateDefinitionView() {

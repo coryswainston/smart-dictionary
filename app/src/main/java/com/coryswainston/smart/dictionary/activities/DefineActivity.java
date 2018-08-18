@@ -41,6 +41,7 @@ public class DefineActivity extends AppCompatActivity
     private DefinitionsFragment definitionsFragment;
     private FragmentManager fragmentManager;
     private SharedPreferences sharedPreferences;
+    private DictionaryLookupService.Callback dictionaryCallback;
 
     private String selectedLanguage;
 
@@ -53,7 +54,7 @@ public class DefineActivity extends AppCompatActivity
         fragmentManager = getSupportFragmentManager();
         sharedPreferences = getSharedPreferences("lexiglass", 0);
 
-        final DictionaryLookupService.Callback dictionaryCallback = (new DictionaryLookupService.Callback() {
+        dictionaryCallback = new DictionaryLookupService.Callback() {
             @Override
             public void callback(String word, String result) {
                 SpannableStringBuilder definitionsList;
@@ -67,7 +68,7 @@ public class DefineActivity extends AppCompatActivity
                 sharedPreferences.edit().putString(word, result).apply();
                 definitionsFragment.setDefinitions(definitionsList);
             }
-        });
+        };
 
         detectedWords = findViewById(R.id.detect_view);
         detectedWords.setMovementMethod(new ScrollingMovementMethod());
@@ -78,21 +79,25 @@ public class DefineActivity extends AppCompatActivity
                     return;
                 }
                 addDefinitionsFragment(text);
-                String cachedDefinition = sharedPreferences.getString(text, null);
-                if (cachedDefinition != null) {
-                    Log.d(TAG, "avoiding API call");
-                    dictionaryCallback.callback(text, cachedDefinition);
-                } else {
-                    Log.d(TAG, "making API call");
-                    new DictionaryLookupService()
-                            .withLanguage(selectedLanguage)
-                            .withCallback(dictionaryCallback)
-                            .execute(text);
-                }
+                getDefinitionFromCacheOrService(text);
             }
         }));
 
         detectedWords.setText(getIntent().getStringExtra("detections"));
+    }
+
+    private void getDefinitionFromCacheOrService(String word) {
+        String cachedDefinition = sharedPreferences.getString(word, null);
+        if (cachedDefinition != null) {
+            Log.d(TAG, "avoiding API call");
+            dictionaryCallback.callback(word, cachedDefinition);
+        } else {
+            Log.d(TAG, "making API call");
+            new DictionaryLookupService()
+                    .withLanguage(selectedLanguage)
+                    .withCallback(dictionaryCallback)
+                    .execute(word);
+        }
     }
 
     private void addDefinitionsFragment(String word) {
@@ -207,9 +212,18 @@ public class DefineActivity extends AppCompatActivity
 
     public void toggleWordEdit(View v) {
         Button b = (Button)v;
-        b.setText("Save");
+        String word = definitionsFragment.toggleWordEdit();
 
-        definitionsFragment.toggleWordEdit();
+        if (b.getText().equals("edit")) {
+            b.setText("save");
+            b.setBackground(getResources().getDrawable(R.drawable.rounded_button_green));
+        } else {
+            b.setText("edit");
+            b.setBackground(getResources().getDrawable(R.drawable.rounded_button));
+
+            getDefinitionFromCacheOrService(word);
+        }
+        b.setPadding(8, 2, 8, 2);
     }
 
     /**
