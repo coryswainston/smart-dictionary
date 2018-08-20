@@ -1,24 +1,17 @@
 package com.coryswainston.smart.dictionary.activities;
 
-import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
-import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
-import com.coryswainston.smart.dictionary.helpers.ParsingException;
-import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
 import com.coryswainston.smart.dictionary.R;
+import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
 import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
 import com.coryswainston.smart.dictionary.listeners.WordGrabber;
 
@@ -40,8 +33,6 @@ public class DefineActivity extends AppCompatActivity
     private SettingsFragment settingsFragment;
     private DefinitionsFragment definitionsFragment;
     private FragmentManager fragmentManager;
-    private SharedPreferences sharedPreferences;
-    private DictionaryLookupService.Callback dictionaryCallback;
 
     private String selectedLanguage;
 
@@ -52,23 +43,8 @@ public class DefineActivity extends AppCompatActivity
 
         selectedLanguage = LANGUAGE_EN;
         fragmentManager = getSupportFragmentManager();
-        sharedPreferences = getSharedPreferences("lexiglass", 0);
 
-        dictionaryCallback = new DictionaryLookupService.Callback() {
-            @Override
-            public void callback(String word, String result) {
-                SpannableStringBuilder definitionsList;
-                try {
-                    definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
-                } catch (ParsingException e) {
-                    Log.i(TAG, "Unable to find word", e);
-                    definitionsList = new SpannableStringBuilder("No definition found.");
-                }
 
-                sharedPreferences.edit().putString(word, result).apply();
-                definitionsFragment.setDefinitions(definitionsList);
-            }
-        };
 
         detectedWords = findViewById(R.id.detect_view);
         detectedWords.setMovementMethod(new ScrollingMovementMethod());
@@ -79,32 +55,17 @@ public class DefineActivity extends AppCompatActivity
                     return;
                 }
                 addDefinitionsFragment(text);
-                getDefinitionFromCacheOrService(text);
             }
         }));
 
         detectedWords.setText(getIntent().getStringExtra("detections"));
     }
 
-    private void getDefinitionFromCacheOrService(String word) {
-        String cachedDefinition = sharedPreferences.getString(word, null);
-        if (cachedDefinition != null) {
-            Log.d(TAG, "avoiding API call");
-            dictionaryCallback.callback(word, cachedDefinition);
-        } else {
-            Log.d(TAG, "making API call");
-            new DictionaryLookupService()
-                    .withLanguage(selectedLanguage)
-                    .withCallback(dictionaryCallback)
-                    .execute(word);
-        }
-    }
-
     private void addDefinitionsFragment(String word) {
         removeSettingsFragment();
 
         if (!fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
-            definitionsFragment = DefinitionsFragment.newInstance(word);
+            definitionsFragment = DefinitionsFragment.newInstance(word, selectedLanguage);
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
                     .add(R.id.define_container, definitionsFragment, TAG_DEFINITIONS_FRAGMENT)
@@ -211,19 +172,7 @@ public class DefineActivity extends AppCompatActivity
     }
 
     public void toggleWordEdit(View v) {
-        Button b = (Button)v;
-        String word = definitionsFragment.toggleWordEdit();
-
-        if (b.getText().equals("edit")) {
-            b.setText("save");
-            b.setBackground(getResources().getDrawable(R.drawable.rounded_button_green));
-        } else {
-            b.setText("edit");
-            b.setBackground(getResources().getDrawable(R.drawable.rounded_button));
-
-            getDefinitionFromCacheOrService(word);
-        }
-        b.setPadding(8, 2, 8, 2);
+        definitionsFragment.toggleWordEdit(v);
     }
 
     /**
