@@ -2,7 +2,6 @@ package com.coryswainston.smart.dictionary.activities;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -18,8 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.coryswainston.smart.dictionary.services.DetectorProcessor;
 import com.coryswainston.smart.dictionary.R;
+import com.coryswainston.smart.dictionary.services.DetectorProcessor;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
