@@ -33,81 +33,95 @@
             android:id="@+id/definitions_definitions_wrapper"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/bg"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/definitions_words_list_wrapper">
 
-            <EditText
-                android:id="@+id/definition_word_heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:background="@null"
-                android:fontFamily="@font/montserrat_bold"
-                android:inputType="none|text"
-                android:text="word"
-                android:textColor="@color/colorPrimary"
-                android:textSize="36sp"
-                app:layout_constraintStart_toStartOf="parent" />
-
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/define_close_wrapper"
-                android:layout_width="60dp"
-                android:layout_height="50dp"
-                android:onClick="onDefinitionFragmentExit"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/definitions_top_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <Button
-                    android:id="@+id/define_close_button"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:id="@+id/edit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:layout_marginStart="16dp"
-                    android:background="@drawable/exit_icon"
-                    android:onClick="onDefinitionFragmentExit"
+                    android:layout_marginStart="24dp"
+                    android:background="@drawable/rounded_button"
+                    android:fontFamily="@font/montserrat"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:onClick="toggleWordEdit"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="2dp"
+                    android:text="edit"
+                    android:textColor="@android:color/white"
+                    android:textSize="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/definition_word_heading" />
 
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/define_close_wrapper"
+                    android:layout_width="60dp"
+                    android:layout_height="50dp"
+                    android:onClick="onDefinitionFragmentExit"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <Button
+                        android:id="@+id/define_close_button"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/exit_icon"
+                        android:onClick="onDefinitionFragmentExit"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+
+                <EditText
+                    android:id="@+id/definition_word_heading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:background="@null"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:inputType="none|text"
+                    android:text="word"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="36sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
 
             <TextView
                 android:id="@+id/definition_text"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="32dp"
-                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/montserrat"
+                android:isScrollContainer="false"
+                android:paddingHorizontal="32dp"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
                 android:text="Sample text"
                 android:textColor="@color/colorGrey"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/definition_word_heading" />
-
-            <Button
-                android:id="@+id/edit_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:background="@drawable/rounded_button"
-                android:fontFamily="@font/montserrat"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:onClick="toggleWordEdit"
-                android:paddingBottom="2dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="2dp"
-                android:text="edit"
-                android:textColor="@android:color/white"
-                android:textSize="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/definition_text"
-                app:layout_constraintStart_toEndOf="@+id/definition_word_heading"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
 
             <ProgressBar
                 android:id="@+id/definition_progress_gif"

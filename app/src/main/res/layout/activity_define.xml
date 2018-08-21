@@ -21,7 +21,7 @@
             android:layout_marginBottom="48dp"
             android:layout_marginEnd="24dp"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/rounded_view"
             android:backgroundTint="@color/colorAccent"
             android:fontFamily="@font/lato"
@@ -58,8 +58,8 @@
 
             <ImageButton
                 android:id="@+id/settings_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/gear_icon"
@@ -81,8 +81,8 @@
 
             <ImageButton
                 android:id="@+id/back_button"
-                android:layout_width="14dp"
-                android:layout_height="24dp"
+                android:layout_width="13dp"
+                android:layout_height="22dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:adjustViewBounds="true"
@@ -102,7 +102,7 @@
         android:id="@+id/define_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="160dp"
         android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

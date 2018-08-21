@@ -2,7 +2,7 @@
     <string name="app_name">Lexiglass</string>
     <string name="app_name_uppercase">LEXIGLASS</string>
     <string name="picture_instructions">Tap to capture text.</string>
-    <string name="word_instructions">TAP TO DEFINE</string>
+    <string name="word_instructions">TAP A WORD TO DEFINE</string>
     <string name="capture">Capture</string>
     <string name="language_instructions">Choose your language</string>
     <string name="settings">Settings</string>
