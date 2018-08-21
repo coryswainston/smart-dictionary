@@ -39,6 +39,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/definitions_words_list_wrapper">
 
+            <Button
+                android:id="@+id/definitions_wiki_search"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/wikipedia_icon"
+                android:onClick="onWikipediaSearch"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@+id/definitions_google_search"
+                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
+
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/definitions_top_wrapper"
                 android:layout_width="match_parent"
@@ -136,6 +148,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/definitions_google_search"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/google_icon"
+                android:onClick="onGoogleSearch"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
 
         </android.support.constraint.ConstraintLayout>
 

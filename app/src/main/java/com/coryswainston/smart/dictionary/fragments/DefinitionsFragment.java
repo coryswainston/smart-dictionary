@@ -1,8 +1,10 @@
 package com.coryswainston.smart.dictionary.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -26,6 +29,8 @@ import com.coryswainston.smart.dictionary.helpers.ParsingException;
 import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +54,9 @@ public class DefinitionsFragment extends Fragment {
     private LinearLayoutManager layoutManager;
     private List<String> words;
     private int selectedIndex;
+
+    private Button googleSearchButton;
+    private Button wikipediaSearchButton;
 
     public DefinitionsFragment() {
         // Required empty public constructor
@@ -113,6 +121,9 @@ public class DefinitionsFragment extends Fragment {
         recyclerAdapter = new RecyclerAdapter(words);
         wordListView.setAdapter(recyclerAdapter);
 
+        googleSearchButton = v.findViewById(R.id.definitions_google_search);
+        wikipediaSearchButton = v.findViewById(R.id.definitions_wiki_search);
+
         addWord(title, selectedLanguage);
 
         return v;
@@ -145,6 +156,10 @@ public class DefinitionsFragment extends Fragment {
         void onDefinitionFragmentExit(View v);
         // should call this.toggleWordEdit()
         void toggleWordEdit(View v);
+        // should call this.onGoogleSearch()
+        void onGoogleSearch(View v);
+        // should call this.onWikipediaSearch()
+        void onWikipediaSearch(View v);
     }
 
     public void onTabClick(View v) {
@@ -165,8 +180,6 @@ public class DefinitionsFragment extends Fragment {
             String oldTitle = title;
             title = titleView.getText().toString();
             if (!title.equals(oldTitle)) {
-                spinner.setVisibility(View.VISIBLE);
-                definitionView.setVisibility(View.INVISIBLE);
                 words.set(selectedIndex, title);
                 recyclerAdapter.notifyDataSetChanged();
                 getDefinitionFromCacheOrService(title);
@@ -192,6 +205,12 @@ public class DefinitionsFragment extends Fragment {
         return String.format("%s-%s", selectedLanguage, word);
     }
 
+    private void fadeIn(View v) {
+        v.setAlpha(0);
+        v.setVisibility(View.VISIBLE);
+        v.animate().alpha(1).setDuration(300);
+    }
+
     private void getDefinitionFromCacheOrService(String word) {
         DictionaryLookupService.Callback dictionaryCallback = new DictionaryLookupService.Callback() {
             @Override
@@ -201,6 +220,8 @@ public class DefinitionsFragment extends Fragment {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
                 } catch (ParsingException e) {
                     definitionsList = new SpannableStringBuilder("No definition found.");
+                    fadeIn(googleSearchButton);
+                    fadeIn(wikipediaSearchButton);
                 }
 
                 if (definitionsList != null) {
@@ -210,13 +231,16 @@ public class DefinitionsFragment extends Fragment {
                 }
 
                 definitionView.setText(definitionsList);
-                definitionView.setVisibility(View.VISIBLE);
+                fadeIn(definitionView);
+                spinner.animate().alpha(0).setDuration(300);
                 spinner.setVisibility(View.GONE);
             }
         };
 
+        googleSearchButton.setVisibility(View.GONE);
+        wikipediaSearchButton.setVisibility(View.GONE);
         definitionView.setVisibility(View.INVISIBLE);
-        spinner.setVisibility(View.VISIBLE);
+        fadeIn(spinner);
 
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);
         if (cachedDefinition != null) {
@@ -303,5 +327,29 @@ public class DefinitionsFragment extends Fragment {
                     }
                 });
         return false;
+    }
+
+    public void onGoogleSearch() {
+        try {
+            String escapedQuery = URLEncoder.encode(words.get(selectedIndex), "UTF-8");
+            Uri uri = Uri.parse("https://www.google.com/#q=" + escapedQuery);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    public void onWikipediaSearch() {
+        try {
+            String escapedQuery = URLEncoder.encode(words.get(selectedIndex), "UTF-8");
+            Uri uri = Uri.parse("https://wikipedia.org/w/index.php?search=" + escapedQuery);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.e(TAG, e.toString());
+        }
     }
 }

@@ -105,6 +105,8 @@ public class DefineActivity extends AppCompatActivity
             alphaAnimation.setDuration(FADE_IN_OUT_TIME);
             wrapper.startAnimation(alphaAnimation);
         }
+
+        findViewById(R.id.settings_container).setClickable(true);
     }
 
     private void removeSettingsFragment() {
@@ -120,6 +122,7 @@ public class DefineActivity extends AppCompatActivity
             alphaAnimation.setDuration(FADE_IN_OUT_TIME);
             wrapper.startAnimation(alphaAnimation);
         }
+        findViewById(R.id.settings_container).setClickable(false);
     }
 
     private boolean fragmentIsPresent(String tag) {
@@ -185,6 +188,16 @@ public class DefineActivity extends AppCompatActivity
         Log.d(TAG, "In onTabClick");
 
         definitionsFragment.onTabClick(v);
+    }
+
+    @Override
+    public void onGoogleSearch(View v) {
+        definitionsFragment.onGoogleSearch();
+    }
+
+    @Override
+    public void onWikipediaSearch(View v) {
+        definitionsFragment.onWikipediaSearch();
     }
 
     /**
