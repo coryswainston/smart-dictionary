@@ -40,7 +40,7 @@
 
             <EditText
                 android:id="@+id/definition_word_heading"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:background="@null"
@@ -49,8 +49,7 @@
                 android:text="word"
                 android:textColor="@color/colorPrimary"
                 android:textSize="36sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/define_close_wrapper"
@@ -99,8 +98,10 @@
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:onClick="toggleWordEdit"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="2dp"
                 android:text="edit"
                 android:textColor="@android:color/white"
                 android:textSize="10dp"

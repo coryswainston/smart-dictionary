@@ -27,7 +27,8 @@
 
         <activity
             android:name=".activities.DefineActivity"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan"/>
     </application>
 
 </manifest>

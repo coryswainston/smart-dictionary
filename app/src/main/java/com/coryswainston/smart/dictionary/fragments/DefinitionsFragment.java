@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -86,6 +88,22 @@ public class DefinitionsFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences("lexiglass", 0);
 
         titleView = v.findViewById(R.id.definition_word_heading);
+        titleView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                titleView.setTextSize(32 - 8 * (s.length() / 10));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // do nothing
+            }
+        });
         titleView.setText(title);
         titleView.setEnabled(false);
 
@@ -160,6 +178,14 @@ public class DefinitionsFragment extends Fragment {
             titleView.setEnabled(true);
             titleView.requestFocus();
         }
+
+        float scale = getResources().getDisplayMetrics().density;
+        int paddingHorizontalInPixels = (int) (8 * scale + 0.5f);
+        int paddingVerticalInPixels = (int) (2 * scale + 0.5f);
+        b.setPadding(paddingHorizontalInPixels,
+                paddingVerticalInPixels,
+                paddingHorizontalInPixels,
+                paddingVerticalInPixels);
     }
 
     private String getKey(String word) {
