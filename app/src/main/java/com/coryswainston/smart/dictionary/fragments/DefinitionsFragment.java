@@ -203,7 +203,11 @@ public class DefinitionsFragment extends Fragment {
                     definitionsList = new SpannableStringBuilder("No definition found.");
                 }
 
-                sharedPreferences.edit().putString(getKey(word), result).apply();
+                if (definitionsList != null) {
+                    sharedPreferences.edit().putString(getKey(word), result).apply();
+                } else {
+                    definitionsList = new SpannableStringBuilder("Check Internet connection");
+                }
 
                 definitionView.setText(definitionsList);
                 definitionView.setVisibility(View.VISIBLE);

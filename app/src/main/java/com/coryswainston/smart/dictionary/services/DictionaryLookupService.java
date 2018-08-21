@@ -1,12 +1,14 @@
 package com.coryswainston.smart.dictionary.services;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.coryswainston.smart.dictionary.config.Key;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -16,9 +18,12 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 public class DictionaryLookupService extends AsyncTask<String, Integer, String> {
+    private static final String TAG = "DictionaryLookupService";
 
     public static final String LANGUAGE_EN = "en";
     public static final String LANGUAGE_ES = "es";
+
+    public static final String NO_INTERNET_ERROR = "no_internet";
 
     private static final String BASE_URL = "https://od-api.oxforddictionaries.com:443/api/v1/entries";
     private String language;
@@ -41,8 +46,11 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
             urlConnection.setRequestProperty("app_id", Key.APP_ID);
             urlConnection.setRequestProperty("app_key", Key.APP_KEY);
 
+            Log.d(TAG, "Response code is " + urlConnection.getResponseCode());
+
             // read the output from the server
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            Log.d(TAG, "did it get to this point");
             StringBuilder stringBuilder = new StringBuilder();
 
             String line;
@@ -54,9 +62,10 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
             urlConnection.getInputStream().close();
 
             return stringBuilder.toString();
-
+        } catch (UnknownHostException e) {
+            return NO_INTERNET_ERROR;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, e.toString());
             return e.toString();
         }
     }

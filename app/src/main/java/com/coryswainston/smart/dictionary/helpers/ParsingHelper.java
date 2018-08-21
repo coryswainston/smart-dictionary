@@ -5,6 +5,8 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 
+import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,10 @@ public class ParsingHelper {
      * @throws ParsingException if anything goes wrong we will treat it the same for now
      */
     public static SpannableStringBuilder parseDefinitionsFromJson(String s) throws ParsingException {
+
+        if (s.startsWith(DictionaryLookupService.NO_INTERNET_ERROR))  {
+            return null;
+        }
 
         try {
             SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
