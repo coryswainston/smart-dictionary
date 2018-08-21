@@ -2,6 +2,7 @@ package com.coryswainston.smart.dictionary.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -22,6 +24,8 @@ import com.coryswainston.smart.dictionary.helpers.ParsingException;
 import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment to hold definitions of words
@@ -40,7 +44,8 @@ public class DefinitionsFragment extends Fragment {
     private ProgressBar spinner;
     private RecyclerView wordListView;
     private RecyclerAdapter recyclerAdapter;
-    private String[] words;
+    private LinearLayoutManager layoutManager;
+    private List<String> words;
     private int selectedIndex;
 
     public DefinitionsFragment() {
@@ -55,11 +60,11 @@ public class DefinitionsFragment extends Fragment {
      */
     public static DefinitionsFragment newInstance(String word, String selectedLanguage) {
         DefinitionsFragment definitionsFragment = new DefinitionsFragment();
-        definitionsFragment.title = word;
 
-        definitionsFragment.words = new String[] {word};
-        definitionsFragment.selectedIndex = 0;
+        definitionsFragment.title = word;
+        definitionsFragment.words = new ArrayList<>();
         definitionsFragment.selectedLanguage = selectedLanguage;
+        definitionsFragment.selectedIndex = -1;
 
         return definitionsFragment;
     }
@@ -75,7 +80,6 @@ public class DefinitionsFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_definitions, container, false);
         definitionView = v.findViewById(R.id.definition_text);
-        definitionView.setVisibility(View.INVISIBLE);
         definitionView.setMovementMethod(new ScrollingMovementMethod());
         spinner = v.findViewById(R.id.definition_progress_gif);
 
@@ -85,13 +89,13 @@ public class DefinitionsFragment extends Fragment {
         titleView.setText(title);
         titleView.setEnabled(false);
 
-        LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         wordListView = v.findViewById(R.id.definitions_word_recycler);
         wordListView.setLayoutManager(layoutManager);
         recyclerAdapter = new RecyclerAdapter(words);
         wordListView.setAdapter(recyclerAdapter);
 
-        getDefinitionFromCacheOrService(words[selectedIndex]);
+        addWord(title, selectedLanguage);
 
         return v;
     }
@@ -117,11 +121,22 @@ public class DefinitionsFragment extends Fragment {
      * Handles interactions with activity.
      */
     public interface OnFragmentInteractionListener {
-        // nothing for now
+        // should call this.onTabClick(v)
+        void onTabClick(View v);
+        // should call this.onExit() and remove fragment when true is returned
+        void onDefinitionFragmentExit(View v);
+        // should call this.toggleWordEdit()
+        void toggleWordEdit(View v);
+    }
+
+    public void onTabClick(View v) {
+        Log.d(TAG, "In onTabClick");
+
+        selectTab(layoutManager.getPosition(v));
     }
 
     public void toggleWordEdit(View v) {
-        Button b = (Button)v;
+        Button b = (Button) v;
 
         if (titleView.isEnabled()) {
             titleView.setEnabled(false);
@@ -134,7 +149,7 @@ public class DefinitionsFragment extends Fragment {
             if (!title.equals(oldTitle)) {
                 spinner.setVisibility(View.VISIBLE);
                 definitionView.setVisibility(View.INVISIBLE);
-                words[selectedIndex] = title;
+                words.set(selectedIndex, title);
                 recyclerAdapter.notifyDataSetChanged();
                 getDefinitionFromCacheOrService(title);
             }
@@ -170,6 +185,9 @@ public class DefinitionsFragment extends Fragment {
             }
         };
 
+        definitionView.setVisibility(View.INVISIBLE);
+        spinner.setVisibility(View.VISIBLE);
+
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);
         if (cachedDefinition != null) {
             Log.d(TAG, "avoiding API call");
@@ -181,5 +199,79 @@ public class DefinitionsFragment extends Fragment {
                     .withCallback(dictionaryCallback)
                     .execute(word);
         }
+    }
+
+    private void selectTab(int index) {
+        if (index == selectedIndex) {
+            return;
+        }
+        selectedIndex = index;
+        title = words.get(index);
+        titleView.setText(title);
+        for (int i = 0; i < words.size(); i++) {
+            Log.d(TAG, "looking for existing views...");
+            TextView tv = (TextView) layoutManager.findViewByPosition(i);
+            if (tv != null) {
+                Log.d(TAG, "View text is " + tv.getText());
+                tv.setBackgroundColor(Color.WHITE);
+            }
+        }
+        Log.d(TAG, "looking for new view...");
+        TextView tv = (TextView) layoutManager.findViewByPosition(index);
+        tv.setBackground(getContext().getResources().getDrawable(R.drawable.underline));
+
+        getDefinitionFromCacheOrService(words.get(index));
+    }
+
+    public void addWord(String word, String selectedLanguage) {
+        final int wordIndex;
+        if (words.contains(word)) {
+            wordIndex = words.indexOf(word);
+        } else {
+            this.selectedLanguage = selectedLanguage;
+            words.add(word);
+            recyclerAdapter.notifyDataSetChanged();
+            wordIndex = words.size() - 1;
+        }
+        wordListView.scrollToPosition(wordIndex);
+
+        wordListView.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        selectTab(wordIndex);
+                        wordListView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                });
+    }
+
+    /**
+     * Removes the current word when exit is clicked.
+     *
+     * @return true if the fragment is empty and should be removed.
+     */
+    public boolean onExit() {
+        if(words.size() <= 1) {
+            return true;
+        }
+
+        words.remove(selectedIndex);
+        final int newIndex;
+        recyclerAdapter.notifyDataSetChanged();
+        if (selectedIndex >= words.size()) {
+            newIndex = words.size() - 1;
+        } else {
+            newIndex = selectedIndex;
+        }
+        selectedIndex = -1;
+        wordListView.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        selectTab(newIndex);
+                        wordListView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                });
+        return false;
     }
 }

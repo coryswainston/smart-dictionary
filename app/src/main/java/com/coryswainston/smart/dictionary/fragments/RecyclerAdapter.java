@@ -2,17 +2,21 @@ package com.coryswainston.smart.dictionary.fragments;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.coryswainston.smart.dictionary.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RecyclerAdapter
  */
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
-    private String[] words;
+    private List<String> words;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;
@@ -22,7 +26,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public RecyclerAdapter(String[] words) {
+    public RecyclerAdapter(List<String> words) {
         this.words = words;
     }
 
@@ -38,14 +42,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.textView.setText(words[position]);
-
+        holder.textView.setText(words.get(position));
     }
 
 
 
     @Override
     public int getItemCount() {
-        return words.length;
+        return words.size();
     }
 }

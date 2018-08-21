@@ -9,7 +9,8 @@
     android:textAlignment="center"
     android:textColor="@color/colorPrimary"
     android:textSize="18sp"
-    android:background="@drawable/underline"
+    android:background="#ffffff"
+    android:onClick="onTabClick"
     tools:text="word">
 
 </TextView>

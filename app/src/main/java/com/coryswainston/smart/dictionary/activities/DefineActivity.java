@@ -52,6 +52,7 @@ public class DefineActivity extends AppCompatActivity
             @Override
             public void callback(String text) {
                 if (fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
+                    definitionsFragment.addWord(text, selectedLanguage);
                     return;
                 }
                 addDefinitionsFragment(text);
@@ -136,8 +137,11 @@ public class DefineActivity extends AppCompatActivity
     /**
      * Called when the user hits the exit button in the corner.
      */
+    @Override
     public void onDefinitionFragmentExit(View v) {
-        removeDefinitionsFragment();
+        if (definitionsFragment.onExit()) {
+            removeDefinitionsFragment();
+        }
     }
 
     /**
@@ -171,8 +175,16 @@ public class DefineActivity extends AppCompatActivity
         removeSettingsFragment();
     }
 
+    @Override
     public void toggleWordEdit(View v) {
         definitionsFragment.toggleWordEdit(v);
+    }
+
+    @Override
+    public void onTabClick(View v) {
+        Log.d(TAG, "In onTabClick");
+
+        definitionsFragment.onTabClick(v);
     }
 
     /**
