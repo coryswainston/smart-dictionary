@@ -3,6 +3,7 @@ package com.coryswainston.smart.dictionary.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -262,17 +263,20 @@ public class DefinitionsFragment extends Fragment {
         selectedIndex = index;
         title = words.get(index);
         titleView.setText(title);
+        Resources res = getContext().getResources();
         for (int i = 0; i < words.size(); i++) {
             Log.d(TAG, "looking for existing views...");
             TextView tv = (TextView) layoutManager.findViewByPosition(i);
             if (tv != null) {
                 Log.d(TAG, "View text is " + tv.getText());
                 tv.setBackgroundColor(Color.WHITE);
+                tv.setTextColor(res.getColor(R.color.colorDeselected));
             }
         }
         Log.d(TAG, "looking for new view...");
         TextView tv = (TextView) layoutManager.findViewByPosition(index);
         tv.setBackground(getContext().getResources().getDrawable(R.drawable.underline));
+        tv.setTextColor(res.getColor(R.color.colorPrimary));
 
         getDefinitionFromCacheOrService(words.get(index));
     }

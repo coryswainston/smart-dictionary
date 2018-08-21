@@ -7,7 +7,7 @@
     android:gravity="center"
     android:padding="16dp"
     android:textAlignment="center"
-    android:textColor="@color/colorPrimary"
+    android:textColor="@color/colorDeselected"
     android:textSize="18sp"
     android:background="#ffffff"
     android:onClick="onTabClick"
