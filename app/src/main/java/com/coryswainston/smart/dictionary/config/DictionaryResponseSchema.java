@@ -11,4 +11,7 @@ public class DictionaryResponseSchema {
     public static final String ENTRIES = "entries";
     public static final String SENSES = "senses";
     public static final String DEFINITIONS = "definitions";
+    public static final String ID = "id";
+    public static final String GRAMMATICAL_FEATURES = "grammaticalFeatures";
+    public static final String INFLECTION_OF = "inflectionOf";
 }

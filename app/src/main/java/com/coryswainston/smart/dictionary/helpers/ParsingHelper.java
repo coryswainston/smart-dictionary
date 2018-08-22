@@ -5,8 +5,10 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 
+import com.coryswainston.smart.dictionary.config.Inflection;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +66,50 @@ public class ParsingHelper {
             }
 
             return stringBuilder;
+        } catch (Exception e) {
+            throw new ParsingException(e);
+        }
+    }
+
+    public static List<Inflection> parseInflectionsFromResponse(String s) throws ParsingException {
+        if (s.startsWith(DictionaryLookupService.NO_INTERNET_ERROR))  {
+            return null;
+        }
+
+        try {
+            List<Inflection> inflections = new ArrayList<>();
+
+            ParsableJson<Object> result = new ParsableJson<>(s)
+                    .getList(RESULTS)
+                    .getObject(0);
+
+            ParsableJson<List<Object>> lexicalEntries = result.getList(LEXICAL_ENTRIES);
+
+            for (ParsableJson<Object> lexicalEntry : lexicalEntries) {
+                Inflection inflection = new Inflection();
+
+                Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
+                inflection.setId(lexicalEntryMap.get(ID));
+
+                inflection.setLexicalCategory(lexicalEntryMap.get(LEXICAL_CATEGORY).toLowerCase());
+
+                ParsableJson<List<Object>> grammaticalFeatures = lexicalEntry.getList(GRAMMATICAL_FEATURES);
+                inflection.setGrammaticalFeatures(new ArrayList<String>());
+
+                for (ParsableJson<Object> grammaticalFeature : grammaticalFeatures) {
+                    inflection.getGrammaticalFeatures().add(grammaticalFeature.getObject("text").getAsObject(String.class));
+                }
+
+                ParsableJson<List<Object>> inflectionOf = lexicalEntry.getList(INFLECTION_OF);
+                inflection.setInflectionOf(new ArrayList<String>());
+                for (ParsableJson<Object> word : inflectionOf) {
+                    inflection.getInflectionOf().add(word.getObject(ID).getAsObject(String.class));
+                }
+
+                inflections.add(inflection);
+            }
+
+            return inflections;
         } catch (Exception e) {
             throw new ParsingException(e);
         }
