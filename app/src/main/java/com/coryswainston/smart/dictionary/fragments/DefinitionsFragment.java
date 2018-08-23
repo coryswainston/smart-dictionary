@@ -15,11 +15,12 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -113,6 +114,25 @@ public class DefinitionsFragment extends Fragment {
                 // do nothing
             }
         });
+        final Button editButton = v.findViewById(R.id.edit_button);
+        titleView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View localTitleView, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP)
+                {
+                    switch (keyCode)
+                    {
+                        case KeyEvent.KEYCODE_DPAD_CENTER:
+                        case KeyEvent.KEYCODE_ENTER:
+                            toggleWordEdit(editButton);
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
         titleView.setText(title);
         titleView.setEnabled(false);
 
@@ -191,6 +211,11 @@ public class DefinitionsFragment extends Fragment {
 
             titleView.setEnabled(true);
             titleView.requestFocus();
+            titleView.setSelection(title.length());
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
         }
 
         float scale = getResources().getDisplayMetrics().density;
