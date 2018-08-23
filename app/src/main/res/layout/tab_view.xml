@@ -11,6 +11,9 @@
     android:textSize="18sp"
     android:background="#ffffff"
     android:onClick="onTabClick"
-    tools:text="word">
+    tools:text="word"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
 </TextView>

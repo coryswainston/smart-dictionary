@@ -49,16 +49,17 @@ public class DefinitionsFragment extends Fragment {
     private String selectedLanguage;
     private EditText titleView;
     private TextView definitionView;
-    private String title;
     private ProgressBar spinner;
     private RecyclerView wordListView;
     private RecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private List<String> words;
-    private int selectedIndex;
+    private String tempTitle;
 
     private Button googleSearchButton;
     private Button wikipediaSearchButton;
+    private Button wordsBackButton;
+    private Button wordsForwardButton;
 
     public DefinitionsFragment() {
         // Required empty public constructor
@@ -73,10 +74,9 @@ public class DefinitionsFragment extends Fragment {
     public static DefinitionsFragment newInstance(String word, String selectedLanguage) {
         DefinitionsFragment definitionsFragment = new DefinitionsFragment();
 
-        definitionsFragment.title = word;
+        definitionsFragment.tempTitle = word;
         definitionsFragment.words = new ArrayList<>();
         definitionsFragment.selectedLanguage = selectedLanguage;
-        definitionsFragment.selectedIndex = -1;
 
         return definitionsFragment;
     }
@@ -133,19 +133,42 @@ public class DefinitionsFragment extends Fragment {
                 return false;
             }
         });
-        titleView.setText(title);
+        titleView.setText(tempTitle);
         titleView.setEnabled(false);
+        tempTitle = null;
 
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         wordListView = v.findViewById(R.id.definitions_word_recycler);
         wordListView.setLayoutManager(layoutManager);
-        recyclerAdapter = new RecyclerAdapter(words);
+        recyclerAdapter = new RecyclerAdapter(getContext(), words);
+        recyclerAdapter.setSelectedIndex(-1);
         wordListView.setAdapter(recyclerAdapter);
+        wordListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                    wordsBackButton.setVisibility(View.INVISIBLE);
+                } else {
+                    wordsBackButton.setVisibility(View.VISIBLE);
+                }
+
+                if (layoutManager.findLastCompletelyVisibleItemPosition() == words.size() - 1) {
+                    wordsForwardButton.setVisibility(View.INVISIBLE);
+                } else {
+                    wordsForwardButton.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
+
+        wordsBackButton = v.findViewById(R.id.definitions_words_list_back);
+        wordsForwardButton = v.findViewById(R.id.definitions_words_list_forward);
 
         googleSearchButton = v.findViewById(R.id.definitions_google_search);
         wikipediaSearchButton = v.findViewById(R.id.definitions_wiki_search);
 
-        addWord(title, selectedLanguage);
+        addWord(titleView.getText().toString(), selectedLanguage);
 
         return v;
     }
@@ -181,6 +204,7 @@ public class DefinitionsFragment extends Fragment {
         void onGoogleSearch(View v);
         // should call this.onWikipediaSearch()
         void onWikipediaSearch(View v);
+        void onWordsBackOrForward(View v);
     }
 
     public void onTabClick(View v) {
@@ -198,10 +222,9 @@ public class DefinitionsFragment extends Fragment {
             b.setText("edit");
             b.setBackground(getResources().getDrawable(R.drawable.rounded_button));
 
-            String oldTitle = title;
-            title = titleView.getText().toString();
-            if (!title.equals(oldTitle)) {
-                words.set(selectedIndex, title);
+            String title = titleView.getText().toString();
+            if (!title.equals(tempTitle)) {
+                words.set(recyclerAdapter.getSelectedIndex(), title);
                 recyclerAdapter.notifyDataSetChanged();
                 getDefinitionFromCacheOrService(title);
             }
@@ -211,11 +234,13 @@ public class DefinitionsFragment extends Fragment {
 
             titleView.setEnabled(true);
             titleView.requestFocus();
-            titleView.setSelection(title.length());
+            titleView.setSelection(titleView.getText().length());
             InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
             }
+
+            tempTitle = titleView.getText().toString();
         }
 
         float scale = getResources().getDisplayMetrics().density;
@@ -285,17 +310,16 @@ public class DefinitionsFragment extends Fragment {
     }
 
     private void selectTab(int index) {
-        if (index == selectedIndex) {
+        if (index == recyclerAdapter.getSelectedIndex()) {
             return;
         }
-        selectedIndex = index;
-        title = words.get(index);
-        titleView.setText(title);
+        recyclerAdapter.setSelectedIndex(index);
+        titleView.setText(words.get(index));
         Resources res = getContext().getResources();
         for (int i = 0; i < words.size(); i++) {
             Log.d(TAG, "looking for existing views...");
             TextView tv = (TextView) layoutManager.findViewByPosition(i);
-            if (tv != null) {
+            if (tv != null && i != recyclerAdapter.getSelectedIndex()) {
                 Log.d(TAG, "View text is " + tv.getText());
                 tv.setBackgroundColor(Color.WHITE);
                 tv.setTextColor(res.getColor(R.color.colorDeselected));
@@ -341,15 +365,17 @@ public class DefinitionsFragment extends Fragment {
             return true;
         }
 
-        words.remove(selectedIndex);
         final int newIndex;
+        final int currentIndex = recyclerAdapter.getSelectedIndex();
+        words.remove(recyclerAdapter.getSelectedIndex());
+
         recyclerAdapter.notifyDataSetChanged();
-        if (selectedIndex >= words.size()) {
+        if (currentIndex >= words.size()) {
             newIndex = words.size() - 1;
         } else {
-            newIndex = selectedIndex;
+            newIndex = currentIndex;
         }
-        selectedIndex = -1;
+        recyclerAdapter.setSelectedIndex(-1);
         wordListView.getViewTreeObserver()
                 .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -363,7 +389,7 @@ public class DefinitionsFragment extends Fragment {
 
     public void onGoogleSearch() {
         try {
-            String escapedQuery = URLEncoder.encode(words.get(selectedIndex), "UTF-8");
+            String escapedQuery = URLEncoder.encode(words.get(recyclerAdapter.getSelectedIndex()), "UTF-8");
             Uri uri = Uri.parse("https://www.google.com/#q=" + escapedQuery);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
@@ -375,13 +401,26 @@ public class DefinitionsFragment extends Fragment {
 
     public void onWikipediaSearch() {
         try {
-            String escapedQuery = URLEncoder.encode(words.get(selectedIndex), "UTF-8");
+            String escapedQuery = URLEncoder.encode(words.get(recyclerAdapter.getSelectedIndex()), "UTF-8");
             Uri uri = Uri.parse("https://wikipedia.org/w/index.php?search=" + escapedQuery);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         }
         catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.toString());
+        }
+    }
+
+    public void onWordsBackOrForward(View v) {
+        if (v.equals(wordsBackButton) || v.findViewById(wordsBackButton.getId()) != null) {
+            wordListView.smoothScrollToPosition(0);
+            wordsForwardButton.setVisibility(View.VISIBLE);
+            wordsBackButton.setVisibility(View.INVISIBLE);
+        }
+        if (v.equals(wordsForwardButton) || v.findViewById(wordsForwardButton.getId()) != null) {
+            wordListView.smoothScrollToPosition(words.size() - 1);
+            wordsForwardButton.setVisibility(View.INVISIBLE);
+            wordsBackButton.setVisibility(View.VISIBLE);
         }
     }
 }

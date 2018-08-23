@@ -206,4 +206,9 @@ public class DefineActivity extends AppCompatActivity
     public void onSettingsCancel(View v) {
         removeSettingsFragment();
     }
+
+    @Override
+    public void onWordsBackOrForward(View v) {
+        definitionsFragment.onWordsBackOrForward(v);
+    }
 }
