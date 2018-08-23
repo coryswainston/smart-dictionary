@@ -220,9 +220,8 @@ public class DefinitionsFragment extends Fragment {
                 try {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
                 } catch (ParsingException e) {
+                    e.printStackTrace();
                     definitionsList = new SpannableStringBuilder("No definition found.");
-                    fadeIn(googleSearchButton);
-                    fadeIn(wikipediaSearchButton);
                 }
 
                 if (definitionsList != null) {
@@ -233,6 +232,10 @@ public class DefinitionsFragment extends Fragment {
 
                 definitionView.setText(definitionsList);
                 fadeIn(definitionView);
+                if (definitionsList.toString().equals("No definition found.")) {
+                    fadeIn(googleSearchButton);
+                    fadeIn(wikipediaSearchButton);
+                }
                 spinner.animate().alpha(0).setDuration(300);
                 spinner.setVisibility(View.GONE);
             }
@@ -244,7 +247,7 @@ public class DefinitionsFragment extends Fragment {
         fadeIn(spinner);
 
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);
-        if (cachedDefinition != null) {
+        if (cachedDefinition != null && !word.equals("get")) {
             Log.d(TAG, "avoiding API call");
             dictionaryCallback.callback(word, cachedDefinition);
         } else {

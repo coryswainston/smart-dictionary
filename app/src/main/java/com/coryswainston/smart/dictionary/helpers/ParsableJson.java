@@ -26,7 +26,9 @@ public class ParsableJson<T> implements Iterable<ParsableJson<Object>> {
 
     public ParsableJson(T jsonObject) {
         this.jsonObject = jsonObject;
-        Log.d("ParsableJson", jsonObject.toString());
+        if (jsonObject != null) {
+            Log.d("ParsableJson", jsonObject.toString());
+        }
     }
 
     @SuppressWarnings("unchecked")

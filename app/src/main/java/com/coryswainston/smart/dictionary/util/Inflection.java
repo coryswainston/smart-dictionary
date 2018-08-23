@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary.config;
+package com.coryswainston.smart.dictionary.util;
 
 import java.util.List;
 

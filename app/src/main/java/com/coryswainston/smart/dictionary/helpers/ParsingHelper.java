@@ -5,14 +5,14 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 
-import com.coryswainston.smart.dictionary.config.Inflection;
+import com.coryswainston.smart.dictionary.util.Inflection;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.coryswainston.smart.dictionary.config.DictionaryResponseSchema.*;
+import static com.coryswainston.smart.dictionary.util.DictionaryResponseSchema.*;
 
 /**
  * Library for parsing JSON responses
@@ -51,22 +51,28 @@ public class ParsingHelper {
                         stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 stringBuilder.append("\n");
 
-                ParsableJson<List<Object>> senses = lexicalEntry.getList(ENTRIES)
-                        .getObject(0)
-                        .getList(SENSES);
+                ParsableJson<List<Object>> entries = lexicalEntry.getList(ENTRIES);
 
-                for (ParsableJson<Object> sense : senses) {
-                    List<String> definitions = sense.getList(DEFINITIONS).getAsList(String.class);
-                    String definition = definitions.get(0);
+                if (entries != null && !entries.get().isEmpty()) {
+                    ParsableJson<List<Object>> senses = entries.getObject(0)
+                            .getList(SENSES);
 
-                    int definitionNumber = senses.get().indexOf(sense.get()) + 1;
-                    stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
+                    for (ParsableJson<Object> sense : senses) {
+                        List<String> definitions = sense.getList(DEFINITIONS).getAsList(String.class);
+                        if (definitions != null && !definitions.isEmpty()) {
+                            String definition = definitions.get(0);
+
+                            int definitionNumber = senses.get().indexOf(sense.get()) + 1;
+                            stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
+                        }
+                    }
+                    stringBuilder.append('\n');
                 }
-                stringBuilder.append('\n');
             }
 
             return stringBuilder;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ParsingException(e);
         }
     }

@@ -3,15 +3,15 @@ package com.coryswainston.smart.dictionary.services;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.coryswainston.smart.dictionary.config.Inflection;
-import com.coryswainston.smart.dictionary.config.Key;
+import com.coryswainston.smart.dictionary.util.DictionaryNetworkUtils;
+import com.coryswainston.smart.dictionary.util.Inflection;
+import com.coryswainston.smart.dictionary.util.Key;
 import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -36,7 +36,20 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
     private String language;
     private String wordToLookup;
 
+    private DictionaryNetworkUtils utils;
+
     private Callback callback;
+
+    public DictionaryLookupService() {
+        utils = new DictionaryNetworkUtils();
+    }
+
+    /**
+     * Constructor for testing
+     */
+    public DictionaryLookupService(DictionaryNetworkUtils utils) {
+        this.utils = utils;
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -77,14 +90,13 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
         } catch (UnknownHostException e) {
             return NO_INTERNET_ERROR;
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            e.printStackTrace();
             return e.toString();
         }
     }
 
     private HttpsURLConnection connectToApi(String operation, String word) throws Exception {
-        URL url = new URL(String.format("%s/%s/%s/%s", BASE_URL, operation, language, word));
-        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        HttpsURLConnection urlConnection = utils.connectToUrl(String.format("%s/%s/%s/%s", BASE_URL, operation, language, word));
         urlConnection.setRequestProperty("Accept", "application/json");
         urlConnection.setRequestProperty("app_id", Key.APP_ID);
         urlConnection.setRequestProperty("app_key", Key.APP_KEY);
