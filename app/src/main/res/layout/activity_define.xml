@@ -14,8 +14,7 @@
         android:layout_height="match_parent"
         android:background="@color/colorPrimary">
 
-        <TextView
-            android:id="@+id/detect_view"
+        <ScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="48dp"
@@ -24,17 +23,29 @@
             android:layout_marginTop="40dp"
             android:background="@drawable/rounded_view"
             android:backgroundTint="@color/colorAccent"
-            android:fontFamily="@font/lato"
+            android:fillViewport="true"
             android:padding="32dp"
             android:scrollbarStyle="insideInset"
             android:scrollbarThumbVertical="@android:color/white"
-            android:scrollbars="vertical"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/define_title" />
+            app:layout_constraintTop_toBottomOf="@+id/define_title">
+
+            <TextView
+                android:id="@+id/detect_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/lato"
+                android:scrollbars="none"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/define_title" />
+
+        </ScrollView>
 
         <TextView
             android:id="@+id/define_title"

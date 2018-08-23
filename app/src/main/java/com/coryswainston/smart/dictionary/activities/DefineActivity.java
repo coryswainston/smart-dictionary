@@ -3,7 +3,7 @@ package com.coryswainston.smart.dictionary.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
+
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -47,7 +47,6 @@ public class DefineActivity extends AppCompatActivity
 
 
         detectedWords = findViewById(R.id.detect_view);
-        detectedWords.setMovementMethod(new ScrollingMovementMethod());
         detectedWords.setOnTouchListener(new WordGrabber(new WordGrabber.Callback() {
             @Override
             public void callback(String text) {

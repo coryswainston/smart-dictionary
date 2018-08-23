@@ -165,24 +165,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/definition_text"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/montserrat"
-                android:isScrollContainer="false"
-                android:paddingHorizontal="32dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbars="vertical"
-                android:text="Sample text"
-                android:textColor="@color/colorGrey"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
-
             <ProgressBar
                 android:id="@+id/definition_progress_gif"
                 style="?android:attr/progressBarStyle"
@@ -208,6 +190,34 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
+
+            <ScrollView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper">
+
+                <TextView
+                    android:id="@+id/definition_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/montserrat"
+                    android:isScrollContainer="false"
+                    android:paddingHorizontal="32dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbars="vertical"
+                    android:text="Sample text"
+                    android:textColor="@color/colorGrey"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
+
+            </ScrollView>
 
         </android.support.constraint.ConstraintLayout>
 

@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -92,7 +91,6 @@ public class DefinitionsFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_definitions, container, false);
         definitionView = v.findViewById(R.id.definition_text);
-        definitionView.setMovementMethod(new ScrollingMovementMethod());
         spinner = v.findViewById(R.id.definition_progress_gif);
 
         sharedPreferences = getContext().getSharedPreferences("lexiglass", 0);
