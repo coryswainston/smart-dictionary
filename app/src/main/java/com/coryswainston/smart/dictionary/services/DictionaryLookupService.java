@@ -1,17 +1,15 @@
 package com.coryswainston.smart.dictionary.services;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.coryswainston.smart.dictionary.util.DictionaryNetworkUtils;
 import com.coryswainston.smart.dictionary.util.Inflection;
 import com.coryswainston.smart.dictionary.util.Key;
-import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
+import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 

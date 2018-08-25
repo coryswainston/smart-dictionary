@@ -1,8 +1,8 @@
 package com.coryswainston.smart.dictionary.helpers;
 
-import org.junit.Test;
+import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Unit tests for the parsing helper

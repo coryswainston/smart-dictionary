@@ -10,6 +10,9 @@ import android.widget.RadioGroup;
 
 import com.coryswainston.smart.dictionary.R;
 
+import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
+import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_ES;
+
 
 /**
  * A fragment to update the language settings for the app.
@@ -74,10 +77,22 @@ public class SettingsFragment extends Fragment {
         interactionListener = null;
     }
 
-    /**
-     * Do something
-     */
     public interface OnFragmentInteractionListener {
-        // do nothin
+        void onSettingsOk(View v);
+    }
+
+    public String onSettingsOk() {
+        RadioGroup languages = getView().findViewById(R.id.radioGroup);
+
+        String selectedLanguage = null;
+        switch (languages.getCheckedRadioButtonId()) {
+            case R.id.english_radio:
+                selectedLanguage = LANGUAGE_EN;
+                break;
+            case R.id.spanish_radio:
+                selectedLanguage = LANGUAGE_ES;
+                break;
+        }
+        return selectedLanguage;
     }
 }

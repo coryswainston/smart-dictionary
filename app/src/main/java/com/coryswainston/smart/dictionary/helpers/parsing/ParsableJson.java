@@ -1,4 +1,4 @@
-package com.coryswainston.smart.dictionary.helpers;
+package com.coryswainston.smart.dictionary.helpers.parsing;
 
 import android.support.annotation.NonNull;
 import android.util.Log;

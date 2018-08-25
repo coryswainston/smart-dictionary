@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Lexiglass</string>
     <string name="app_name_uppercase">LEXIGLASS</string>
-    <string name="picture_instructions">Tap to capture text.</string>
+    <string name="picture_instructions">Press and hold on any word to define it.</string>
     <string name="word_instructions">TAP A WORD TO DEFINE</string>
-    <string name="capture">Capture</string>
+    <string name="capture">Capture text</string>
     <string name="language_instructions">Choose your language</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>

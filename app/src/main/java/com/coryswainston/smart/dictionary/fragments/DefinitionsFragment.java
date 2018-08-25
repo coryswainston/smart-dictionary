@@ -26,8 +26,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.coryswainston.smart.dictionary.R;
-import com.coryswainston.smart.dictionary.helpers.ParsingException;
-import com.coryswainston.smart.dictionary.helpers.ParsingHelper;
+import com.coryswainston.smart.dictionary.helpers.parsing.ParsingException;
+import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
 import java.io.UnsupportedEncodingException;

@@ -7,6 +7,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class DetectorProcessor implements Detector.Processor<TextBlock> {
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
         SparseArray<TextBlock> textBlocks = detections.getDetectedItems();
 
+        List<Text> wordBlocks = new ArrayList<>();
+
         Map<String, Rect> words = new HashMap<>();
         StringBuilder sb = new StringBuilder();
 
@@ -38,11 +41,12 @@ public class DetectorProcessor implements Detector.Processor<TextBlock> {
                 List<? extends Text> wordList = lines.get(j).getComponents();
                 for (int k = 0; k < wordList.size(); k++) {
                     words.put(wordList.get(k).getValue(), wordList.get(k).getBoundingBox());
+                    wordBlocks.add(wordList.get(k));
                 }
             }
         }
 
-        callback.callback(words, sb.toString());
+        callback.callback(wordBlocks, sb.toString());
     }
 
     public DetectorProcessor withCallback(Callback callback) {
@@ -51,6 +55,6 @@ public class DetectorProcessor implements Detector.Processor<TextBlock> {
     }
 
     public interface Callback {
-        void callback(Map<String, Rect> wordCoordinateMap, String detectedText);
+        void callback(List<Text> blocks, String detectedText);
     }
 }
