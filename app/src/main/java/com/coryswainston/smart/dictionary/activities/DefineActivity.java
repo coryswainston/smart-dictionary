@@ -2,6 +2,7 @@ package com.coryswainston.smart.dictionary.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
@@ -52,6 +53,7 @@ public class DefineActivity extends AppCompatActivity
         }));
 
         detectedWords.setText(getIntent().getStringExtra("detections"));
+        detectedWords.setMovementMethod(new ScrollingMovementMethod());
     }
 
     /**
