@@ -17,7 +17,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.coryswainston.smart.dictionary.R;
@@ -80,6 +79,8 @@ public class MainActivity
         fragmentHelper = new FragmentHelper(this);
         captureButton = findViewById(R.id.capture_button);
         defineButton = findViewById(R.id.define_button);
+        defineButton.setScaleX(0);
+        defineButton.setScaleY(0);
         surfaceView = findViewById(R.id.surfaceView);
         loadingGif = findViewById(R.id.loading_gif);
         loadingGif.setVisibility(View.GONE);
@@ -133,14 +134,14 @@ public class MainActivity
                         case MotionEvent.ACTION_DOWN:
                         case MotionEvent.ACTION_MOVE:
                             if (eventTouchesDefineButton(event)) {
-                                defineButton.setBackground(getResources().getDrawable(R.drawable.rounded_view_grey));
+                                defineButton.setBackground(getResources().getDrawable(R.drawable.define_button_pressed_bg));
                                 if (!buzzed) {
                                     defineButton.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                                     buzzed = true;
                                 }
                                 return true;
                             } else {
-                                defineButton.setBackground(getResources().getDrawable(R.drawable.rounded_view));
+                                defineButton.setBackground(getResources().getDrawable(R.drawable.define_button_bg));
                                 buzzed = false;
                             }
 
@@ -166,7 +167,7 @@ public class MainActivity
                         case MotionEvent.ACTION_UP:
                             defineButton.animate().scaleX(0).scaleY(0).setDuration(300);
                             if (eventTouchesDefineButton(event)) {
-                                defineButton.setBackground(getResources().getDrawable(R.drawable.rounded_view));
+                                defineButton.setBackground(getResources().getDrawable(R.drawable.define_button_bg));
                                 buzzed = false;
                                 defineButton.performClick();
                             } else {
@@ -183,12 +184,7 @@ public class MainActivity
         }
 
         private void bringUpDefineButton(MotionEvent event) {
-            defineButton.setVisibility(View.VISIBLE);
-            defineButton.setTransformationMethod(null);
-            defineButton.setScaleX(0);
-            defineButton.setScaleY(0);
-            defineButton.animate().scaleX(1).scaleY(1).setDuration(300);
-            defineButton.setText("Define \"" + selectedWord + "\"");
+            defineButton.setText(selectedWord);
             float x = event.getX() + surfaceView.getLeft() - (float)defineButton.getWidth() / 2f;
             if (x < 0) {
                 x = 0;
@@ -196,9 +192,17 @@ public class MainActivity
             if (x > surfaceView.getRight() - defineButton.getWidth()) {
                 x = surfaceView.getRight() - defineButton.getWidth();
             }
-            defineButton.setX(x);
-            float y = event.getY() + surfaceView.getTop() - (float)defineButton.getHeight() - 70;
-            defineButton.setY(y);
+            float y = event.getY() + surfaceView.getTop() - (float)defineButton.getHeight() - 80;
+
+            if (defineButton.getScaleX() == 0) {
+                defineButton.setX(x);
+                defineButton.setY(y);
+                defineButton.setTransformationMethod(null);
+                defineButton.animate().scaleX(1).scaleY(1).setDuration(300);
+            } else {
+                defineButton.animate().translationX(x);
+                defineButton.animate().translationY(y);
+            }
         }
 
         private boolean eventTouchesDefineButton(MotionEvent event) {
