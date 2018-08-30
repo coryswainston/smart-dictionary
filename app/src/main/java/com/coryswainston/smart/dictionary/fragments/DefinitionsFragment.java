@@ -295,7 +295,7 @@ public class DefinitionsFragment extends Fragment {
         fadeIn(spinner);
 
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);
-        if (cachedDefinition != null && !word.equals("get")) {
+        if (cachedDefinition != null) {
             Log.d(TAG, "avoiding API call");
             dictionaryCallback.callback(word, cachedDefinition);
         } else {
