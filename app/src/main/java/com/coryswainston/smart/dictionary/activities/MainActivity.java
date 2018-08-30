@@ -88,12 +88,6 @@ public class MainActivity
         surfaceAvailable = false;
         surfaceView.getHolder().addCallback(new SurfaceCallback());
 
-        if (!checkForPermissions(Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.INTERNET)) {
-            Toast.makeText(this, "Unable to obtain permissions.", Toast.LENGTH_SHORT).show();
-        }
-
         selectedLanguage = LANGUAGE_EN;
     }
 
@@ -101,14 +95,18 @@ public class MainActivity
         @Override
         public void surfaceCreated(final SurfaceHolder surfaceHolder) {
             surfaceAvailable = true;
-            try {
-                setUpCamera();
-            }
-            catch (SecurityException e) {
-                Log.e("surfaceCallback", e.toString());
-            }
-            catch (IOException e) {
-                Log.e("surfaceCallback", e.toString());
+            if (checkForPermissions(Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.INTERNET)) {
+                try {
+                    setUpCamera();
+                }
+                catch (SecurityException e) {
+                    Log.e("surfaceCallback", e.toString());
+                }
+                catch (IOException e) {
+                    Log.e("surfaceCallback", e.toString());
+                }
             }
 
             View.OnClickListener captureText = new View.OnClickListener() {
@@ -300,12 +298,23 @@ public class MainActivity
             return;
         }
 
-        for (int result : results) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Unable to obtain permissions.", Toast.LENGTH_LONG).show();
+        for (int i = 0; i < results.length; i++) {
+            if (results[i] != PackageManager.PERMISSION_GRANTED && permissions[i] != null) {
+                Toast.makeText(this, "Need permissions to use camera.", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
+
+        try {
+            setUpCamera();
+        }
+        catch (SecurityException e) {
+            Log.e("surfaceCallback", e.toString());
+        }
+        catch (IOException e) {
+            Log.e("surfaceCallback", e.toString());
+        }
+
     }
 
     private void setUpCamera() throws IOException, SecurityException {
@@ -367,11 +376,13 @@ public class MainActivity
 
         loadingGif.setVisibility(View.GONE);
 
-        try {
-            startCameraSource();
-        }
-        catch (IOException e) {
-            Log.e(TAG, e.toString());
+        if (cameraSource != null) {
+            try {
+                startCameraSource();
+            }
+            catch (IOException e) {
+                Log.e(TAG, e.toString());
+            }
         }
     }
 
@@ -381,7 +392,9 @@ public class MainActivity
     @Override
     protected void onPause() {
         super.onPause();
-        cameraSource.stop();
+        if (cameraSource != null) {
+            cameraSource.stop();
+        }
     }
 
     /**
@@ -391,7 +404,9 @@ public class MainActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraSource.release();
+        if (cameraSource != null) {
+            cameraSource.release();
+        }
     }
 
     /**
