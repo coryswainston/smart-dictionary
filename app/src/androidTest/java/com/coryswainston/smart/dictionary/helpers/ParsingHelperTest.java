@@ -1,8 +1,13 @@
 package com.coryswainston.smart.dictionary.helpers;
 
 import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
+import com.coryswainston.smart.dictionary.schema.entry.RetrieveEntry;
+import com.google.gson.Gson;
 
 import org.junit.Test;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for the parsing helper

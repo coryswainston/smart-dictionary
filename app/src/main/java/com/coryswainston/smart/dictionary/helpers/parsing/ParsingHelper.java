@@ -5,14 +5,20 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 
-import com.coryswainston.smart.dictionary.util.Inflection;
+import com.coryswainston.smart.dictionary.schema.entry.Entry;
+import com.coryswainston.smart.dictionary.schema.entry.HeadwordEntry;
+import com.coryswainston.smart.dictionary.schema.entry.LexicalEntry;
+import com.coryswainston.smart.dictionary.schema.entry.RetrieveEntry;
+import com.coryswainston.smart.dictionary.schema.entry.Sense;
+import com.coryswainston.smart.dictionary.schema.inflection.HeadwordLemmatron;
+import com.coryswainston.smart.dictionary.schema.inflection.Inflection;
+import com.coryswainston.smart.dictionary.schema.inflection.Lemmatron;
+import com.coryswainston.smart.dictionary.schema.inflection.LemmatronLexicalEntry;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static com.coryswainston.smart.dictionary.util.DictionaryResponseSchema.*;
 
 /**
  * Library for parsing JSON responses
@@ -36,37 +42,46 @@ public class ParsingHelper {
         try {
             SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
 
-            ParsableJson<Object> result = new ParsableJson<>(s)
-                    .getList(RESULTS)
-                    .getObject(0);
+            RetrieveEntry retrieveEntry = new Gson().fromJson(s, RetrieveEntry.class);
+            List<HeadwordEntry> results  = retrieveEntry.getResults();
+            if (results != null) {
+                for (HeadwordEntry result : results) {
+                    if (result != null) {
+                        List<LexicalEntry> lexicalEntries = result.getLexicalEntries();
+                        for (LexicalEntry lexicalEntry : lexicalEntries) {
+                            if (lexicalEntry != null) {
+                                String lexicalCategory = lexicalEntry.getLexicalCategory();
+                                if (lexicalCategory != null) {
+                                    stringBuilder.append(lexicalCategory.toLowerCase());
+                                    stringBuilder.setSpan(new StyleSpan(Typeface.BOLD),
+                                            stringBuilder.length() - lexicalCategory.length(),
+                                            stringBuilder.length(),
+                                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    stringBuilder.append("\n");
+                                }
 
-
-            ParsableJson<List<Object>> lexicalEntries = result.getList(LEXICAL_ENTRIES);
-
-            for (ParsableJson<Object> lexicalEntry : lexicalEntries) {
-                Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
-                String lexicalCategory = lexicalEntryMap.get(LEXICAL_CATEGORY).toLowerCase();
-                stringBuilder.append(lexicalCategory);
-                stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), stringBuilder.length() - lexicalCategory.length(),
-                        stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                stringBuilder.append("\n");
-
-                ParsableJson<List<Object>> entries = lexicalEntry.getList(ENTRIES);
-
-                if (entries != null && !entries.get().isEmpty()) {
-                    ParsableJson<List<Object>> senses = entries.getObject(0)
-                            .getList(SENSES);
-
-                    for (ParsableJson<Object> sense : senses) {
-                        List<String> definitions = sense.getList(DEFINITIONS).getAsList(String.class);
-                        if (definitions != null && !definitions.isEmpty()) {
-                            String definition = definitions.get(0);
-
-                            int definitionNumber = senses.get().indexOf(sense.get()) + 1;
-                            stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
+                                List<Entry> entries = lexicalEntry.getEntries();
+                                if (entries != null) {
+                                    for(Entry entry : lexicalEntry.getEntries()) {
+                                        if (entry != null) {
+                                            List<Sense> senses = entry.getSenses();
+                                            if (senses != null) {
+                                                for (Sense sense : senses) {
+                                                    List<String> definitions = sense.getDefinitions();
+                                                    if (definitions != null && !definitions.isEmpty()) {
+                                                        int definitionNumber = senses.indexOf(sense) + 1;
+                                                        String definition = definitions.get(0);
+                                                        stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
+                                                    }
+                                                }
+                                                stringBuilder.append("\n");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                    stringBuilder.append('\n');
                 }
             }
 
@@ -85,34 +100,22 @@ public class ParsingHelper {
         try {
             List<Inflection> inflections = new ArrayList<>();
 
-            ParsableJson<Object> result = new ParsableJson<>(s)
-                    .getList(RESULTS)
-                    .getObject(0);
+            Lemmatron response = new Gson().fromJson(s, Lemmatron.class);
+            List<HeadwordLemmatron> results = response.getResults();
 
-            ParsableJson<List<Object>> lexicalEntries = result.getList(LEXICAL_ENTRIES);
-
-            for (ParsableJson<Object> lexicalEntry : lexicalEntries) {
-                Inflection inflection = new Inflection();
-
-                Map<String, String> lexicalEntryMap = lexicalEntry.getAsMap(String.class, String.class);
-                inflection.setId(lexicalEntryMap.get(ID));
-
-                inflection.setLexicalCategory(lexicalEntryMap.get(LEXICAL_CATEGORY).toLowerCase());
-
-                ParsableJson<List<Object>> grammaticalFeatures = lexicalEntry.getList(GRAMMATICAL_FEATURES);
-                inflection.setGrammaticalFeatures(new ArrayList<String>());
-
-                for (ParsableJson<Object> grammaticalFeature : grammaticalFeatures) {
-                    inflection.getGrammaticalFeatures().add(grammaticalFeature.getObject("text").getAsObject(String.class));
+            if (results != null) {
+                for (HeadwordLemmatron result : results) {
+                    if (result != null) {
+                        List<LemmatronLexicalEntry> lexicalEntries = result.getLexicalEntries();
+                        if (lexicalEntries != null) {
+                            for (LemmatronLexicalEntry lexicalEntry : lexicalEntries) {
+                                if (lexicalEntry != null) {
+                                    inflections.addAll(lexicalEntry.getInflectionOf());
+                                }
+                            }
+                        }
+                    }
                 }
-
-                ParsableJson<List<Object>> inflectionOf = lexicalEntry.getList(INFLECTION_OF);
-                inflection.setInflectionOf(new ArrayList<String>());
-                for (ParsableJson<Object> word : inflectionOf) {
-                    inflection.getInflectionOf().add(word.getObject(ID).getAsObject(String.class));
-                }
-
-                inflections.add(inflection);
             }
 
             return inflections;

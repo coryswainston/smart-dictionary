@@ -2,6 +2,7 @@ package com.coryswainston.smart.dictionary;
 
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
 /**

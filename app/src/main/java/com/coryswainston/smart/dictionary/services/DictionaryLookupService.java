@@ -3,7 +3,7 @@ package com.coryswainston.smart.dictionary.services;
 import android.os.AsyncTask;
 
 import com.coryswainston.smart.dictionary.util.DictionaryNetworkUtils;
-import com.coryswainston.smart.dictionary.util.Inflection;
+import com.coryswainston.smart.dictionary.schema.inflection.Inflection;
 import com.coryswainston.smart.dictionary.util.Key;
 import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
 
@@ -67,13 +67,13 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
                 String wordToDefine = null;
                 List<Inflection> inflections = ParsingHelper.parseInflectionsFromResponse(response);
                 for (Inflection inflection : inflections) {
-                    if (inflection.getInflectionOf().contains(wordToLookup)) {
+                    if (inflection.getId().equals(wordToLookup)) {
                         wordToDefine = wordToLookup;
                         break;
                     }
                 }
                 if (wordToDefine == null) {
-                    wordToDefine = inflections.get(0).getInflectionOf().get(0);
+                    wordToDefine = inflections.get(0).getId();
                 }
 
                 HttpsURLConnection definitionConnection = connectToApi(ENTRIES, wordToDefine);
