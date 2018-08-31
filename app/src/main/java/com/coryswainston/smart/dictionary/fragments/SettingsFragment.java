@@ -3,9 +3,12 @@ package com.coryswainston.smart.dictionary.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.RadioGroup;
 
 import com.coryswainston.smart.dictionary.R;
@@ -18,6 +21,8 @@ import static com.coryswainston.smart.dictionary.services.DictionaryLookupServic
  * A fragment to update the language settings for the app.
  */
 public class SettingsFragment extends Fragment {
+    public static final String TAG = "settings";
+    private static final int FADE_IN_OUT_TIME = 200;
 
     private OnFragmentInteractionListener interactionListener;
 
@@ -93,6 +98,50 @@ public class SettingsFragment extends Fragment {
                 selectedLanguage = LANGUAGE_ES;
                 break;
         }
+
+        this.remove();
         return selectedLanguage;
+    }
+
+    public void show(FragmentActivity activity) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(TAG) == null) {
+            DefinitionsFragment definitionsFragment = (DefinitionsFragment) fragmentManager.findFragmentByTag(DefinitionsFragment.TAG);
+            if(definitionsFragment != null) {
+                definitionsFragment.remove();
+            }
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.fade_alpha_in, R.anim.fade_alpha_out)
+                    .add(R.id.settings_container, this, TAG)
+                    .commit();
+
+            View wrapper = activity.findViewById(R.id.wrapper);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.5f);
+            alphaAnimation.setFillAfter(true);
+            alphaAnimation.setDuration(FADE_IN_OUT_TIME);
+            wrapper.startAnimation(alphaAnimation);
+            activity.findViewById(R.id.settings_container).setClickable(true);
+        }
+    }
+
+    public void remove() {
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(TAG) != null) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.fade_alpha_in, R.anim.fade_alpha_out)
+                    .remove(this)
+                    .commit();
+
+            View wrapper = activity.findViewById(R.id.wrapper);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0.5f, 1.0f);
+            alphaAnimation.setFillAfter(true);
+            alphaAnimation.setDuration(FADE_IN_OUT_TIME);
+            wrapper.startAnimation(alphaAnimation);
+            activity.findViewById(R.id.settings_container).setClickable(false);
+        }
     }
 }

@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -41,7 +43,7 @@ import java.util.List;
  */
 public class DefinitionsFragment extends Fragment {
 
-    private static final String TAG = "DefinitionsFragment";
+    public static final String TAG = "DefinitionsFragment";
 
     private OnFragmentInteractionListener interactionListener;
     private SharedPreferences sharedPreferences;
@@ -351,12 +353,11 @@ public class DefinitionsFragment extends Fragment {
     }
 
     /**
-     * Removes the current word when exit is clicked.
-     *
-     * @return true if the fragment is empty and should be removed.
+     * Removes the current word when exit is clicked. Removes whole fragment if the words are gone.
      */
     public boolean onExit() {
         if(words.size() <= 1) {
+            this.remove();
             return true;
         }
 
@@ -416,6 +417,34 @@ public class DefinitionsFragment extends Fragment {
             wordListView.smoothScrollToPosition(words.size() - 1);
             wordsForwardButton.setVisibility(View.INVISIBLE);
             wordsBackButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void show(FragmentActivity activity) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(TAG) == null) {
+            SettingsFragment settingsFragment = (SettingsFragment)fragmentManager.findFragmentByTag(SettingsFragment.TAG);
+            if (settingsFragment != null) {
+                settingsFragment.remove();
+            }
+
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                    .add(R.id.define_container, this, TAG)
+                    .commit();
+            activity.findViewById(R.id.define_container).setClickable(true);
+        }
+    }
+
+    public void remove() {
+        FragmentActivity activity = getActivity();
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(TAG) != null) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                    .remove(this)
+                    .commit();
+            activity.findViewById(R.id.define_container).setClickable(false);
         }
     }
 }

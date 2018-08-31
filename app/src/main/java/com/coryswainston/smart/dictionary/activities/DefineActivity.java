@@ -11,11 +11,8 @@ import android.widget.TextView;
 import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
 import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
-import com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper;
 import com.coryswainston.smart.dictionary.listeners.WordGrabber;
 
-import static com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper.TAG_DEFINITIONS_FRAGMENT;
-import static com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper.TAG_SETTINGS_FRAGMENT;
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
 
 public class DefineActivity extends AppCompatActivity
@@ -27,7 +24,6 @@ public class DefineActivity extends AppCompatActivity
     private TextView detectedWords;
     private DefinitionsFragment definitionsFragment;
     private SettingsFragment settingsFragment;
-    private FragmentHelper fragmentHelper;
 
     private String selectedLanguage;
 
@@ -38,17 +34,16 @@ public class DefineActivity extends AppCompatActivity
 
         selectedLanguage = LANGUAGE_EN;
 
-        fragmentHelper = new FragmentHelper(this);
-
         detectedWords = findViewById(R.id.detect_view);
         detectedWords.setOnTouchListener(new WordGrabber(new WordGrabber.Callback() {
             @Override
             public void callback(String text) {
-                if (fragmentHelper.fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
+                if (definitionsFragment == null) {
+                    definitionsFragment = DefinitionsFragment.newInstance(text, selectedLanguage);
+                } else {
                     definitionsFragment.addWord(text, selectedLanguage);
-                    return;
                 }
-                definitionsFragment = fragmentHelper.addDefinitionsFragment(text, selectedLanguage);
+                definitionsFragment.show(DefineActivity.this);
             }
         }));
 
@@ -70,7 +65,7 @@ public class DefineActivity extends AppCompatActivity
     @Override
     public void onDefinitionFragmentExit(View v) {
         if (definitionsFragment.onExit()) {
-            fragmentHelper.removeDefinitionsFragment();
+            definitionsFragment = null;
         }
     }
 
@@ -79,10 +74,12 @@ public class DefineActivity extends AppCompatActivity
      */
     public void onSettingsClick(View v) {
         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-        if (fragmentHelper.fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
-            fragmentHelper.removeSettingsFragment();
+        if (settingsFragment == null) {
+            settingsFragment = SettingsFragment.newInstance(selectedLanguage);
+            settingsFragment.show(this);
         } else {
-            settingsFragment = fragmentHelper.addSettingsFragment(selectedLanguage);
+            settingsFragment.remove();
+            settingsFragment = null;
         }
     }
 
@@ -92,7 +89,6 @@ public class DefineActivity extends AppCompatActivity
     @Override
     public void onSettingsOk(View v) {
         selectedLanguage = settingsFragment.onSettingsOk();
-        fragmentHelper.removeSettingsFragment();
     }
 
     @Override
@@ -121,7 +117,8 @@ public class DefineActivity extends AppCompatActivity
      * Called when the user hits the 'cancel' button in the settings fragment.
      */
     public void onSettingsCancel(View v) {
-        fragmentHelper.removeSettingsFragment();
+        settingsFragment.remove();
+        settingsFragment = null;
     }
 
     @Override

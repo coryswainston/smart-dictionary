@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
 import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
-import com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper;
 import com.coryswainston.smart.dictionary.services.DetectorProcessor;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -36,8 +35,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper.TAG_DEFINITIONS_FRAGMENT;
-import static com.coryswainston.smart.dictionary.helpers.fragment.FragmentHelper.TAG_SETTINGS_FRAGMENT;
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
 import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
 
@@ -58,7 +55,6 @@ public class MainActivity
 
     private SettingsFragment settingsFragment;
     private DefinitionsFragment definitionsFragment;
-    private FragmentHelper fragmentHelper;
 
     private String selectedLanguage;
 
@@ -76,7 +72,6 @@ public class MainActivity
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        fragmentHelper = new FragmentHelper(this);
         captureButton = findViewById(R.id.capture_button);
         defineButton = findViewById(R.id.define_button);
         defineButton.setScaleX(0);
@@ -230,11 +225,12 @@ public class MainActivity
     }
 
     public void onDefineButtonClick(View v) {
-        if (fragmentHelper.fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
-            definitionsFragment.addWord(selectedWord, selectedLanguage);
+        if (definitionsFragment == null) {
+            definitionsFragment = DefinitionsFragment.newInstance(selectedWord, selectedLanguage);
         } else {
-            definitionsFragment = fragmentHelper.addDefinitionsFragment(selectedWord, selectedLanguage);
+            definitionsFragment.addWord(selectedWord, selectedLanguage);
         }
+        definitionsFragment.show(this);
         activeEvent = null;
         selectedWord = null;
     }
@@ -415,7 +411,7 @@ public class MainActivity
     @Override
     public void onDefinitionFragmentExit(View v) {
         if (definitionsFragment.onExit()) {
-            fragmentHelper.removeDefinitionsFragment();
+            definitionsFragment = null;
         }
     }
 
@@ -424,10 +420,12 @@ public class MainActivity
      */
     public void onSettingsClick(View v) {
         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-        if (fragmentHelper.fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
-            fragmentHelper.removeSettingsFragment();
+        if (settingsFragment != null) {
+            settingsFragment.remove();
+            settingsFragment = null;
         } else {
-            settingsFragment = fragmentHelper.addSettingsFragment(selectedLanguage);
+            settingsFragment = SettingsFragment.newInstance(selectedLanguage);
+            settingsFragment.show(this);
         }
     }
 
@@ -437,7 +435,7 @@ public class MainActivity
     @Override
     public void onSettingsOk(View v) {
         selectedLanguage = settingsFragment.onSettingsOk();
-        fragmentHelper.removeSettingsFragment();
+        settingsFragment = null;
     }
 
     @Override
@@ -464,7 +462,8 @@ public class MainActivity
      * Called when the user hits the 'cancel' button in the settings fragment.
      */
     public void onSettingsCancel(View v) {
-        fragmentHelper.removeSettingsFragment();
+        settingsFragment.remove();
+        settingsFragment = null;
     }
 
     @Override
@@ -474,10 +473,12 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
-        if (fragmentHelper.fragmentIsPresent(TAG_DEFINITIONS_FRAGMENT)) {
-            fragmentHelper.removeDefinitionsFragment();
-        } else if (fragmentHelper.fragmentIsPresent(TAG_SETTINGS_FRAGMENT)) {
-            fragmentHelper.removeSettingsFragment();
+        if (definitionsFragment != null) {
+            definitionsFragment.remove();
+            definitionsFragment = null;
+        } else if (settingsFragment != null) {
+            settingsFragment.remove();
+            settingsFragment = null;
         } else {
             super.onBackPressed();
         }
