@@ -87,18 +87,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/definitions_words_list_wrapper">
 
-            <Button
-                android:id="@+id/definitions_wiki_search"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="48dp"
-                android:background="@drawable/wikipedia_icon"
-                android:onClick="onWikipediaSearch"
-                android:visibility="gone"
-                app:layout_constraintStart_toEndOf="@+id/definitions_google_search"
-                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
-
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/definitions_top_wrapper"
                 android:layout_width="match_parent"
@@ -179,44 +167,73 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/definitions_google_search"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="48dp"
-                android:background="@drawable/google_icon"
-                android:onClick="onGoogleSearch"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
-
             <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper">
 
-                <TextView
-                    android:id="@+id/definition_text"
+                <LinearLayout
+                    android:id="@+id/definition_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:isScrollContainer="false"
-                    android:paddingHorizontal="32dp"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbars="vertical"
-                    android:text="Sample text"
-                    android:textColor="@color/colorGrey"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
+                    android:orientation="vertical"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp">
 
+                    <TextView
+                        android:id="@+id/definition_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/montserrat"
+                        android:isScrollContainer="false"
+                        android:scrollbarStyle="outsideOverlay"
+                        android:scrollbars="vertical"
+                        android:text="Sample text"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/definitions_top_wrapper" />
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="@drawable/top_border"
+                        android:paddingBottom="12dp"
+                        android:paddingTop="12dp">
+
+                        <Button
+                            android:id="@+id/definitions_google_search"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/google_icon"
+                            android:onClick="onGoogleSearch"
+                            android:visibility="visible"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                            android:id="@+id/definitions_wiki_search"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="12dp"
+                            android:background="@drawable/wikipedia_icon"
+                            android:onClick="onWikipediaSearch"
+                            android:visibility="visible"
+                            app:layout_constraintStart_toEndOf="@+id/definitions_google_search"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </android.support.constraint.ConstraintLayout>
+
+                </LinearLayout>
             </ScrollView>
 
         </android.support.constraint.ConstraintLayout>

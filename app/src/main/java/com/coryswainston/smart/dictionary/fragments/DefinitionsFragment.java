@@ -22,6 +22,7 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,6 +49,7 @@ public class DefinitionsFragment extends Fragment {
     private String selectedLanguage;
     private EditText titleView;
     private TextView definitionView;
+    private LinearLayout definitionContent;
     private ProgressBar spinner;
     private RecyclerView wordListView;
     private RecyclerAdapter recyclerAdapter;
@@ -55,8 +57,6 @@ public class DefinitionsFragment extends Fragment {
     private List<String> words;
     private String tempTitle;
 
-    private Button googleSearchButton;
-    private Button wikipediaSearchButton;
     private Button wordsBackButton;
     private Button wordsForwardButton;
 
@@ -163,8 +163,7 @@ public class DefinitionsFragment extends Fragment {
         wordsBackButton = v.findViewById(R.id.definitions_words_list_back);
         wordsForwardButton = v.findViewById(R.id.definitions_words_list_forward);
 
-        googleSearchButton = v.findViewById(R.id.definitions_google_search);
-        wikipediaSearchButton = v.findViewById(R.id.definitions_wiki_search);
+        definitionContent = v.findViewById(R.id.definition_content);
 
         addWord(titleView.getText().toString(), selectedLanguage);
 
@@ -279,19 +278,17 @@ public class DefinitionsFragment extends Fragment {
                 }
 
                 definitionView.setText(definitionsList);
-                fadeIn(definitionView);
-                if (definitionsList.toString().equals("No definition found.")) {
-                    fadeIn(googleSearchButton);
-                    fadeIn(wikipediaSearchButton);
-                }
-                spinner.animate().alpha(0).setDuration(300);
-                spinner.setVisibility(View.GONE);
+                fadeIn(definitionContent);
+                spinner.animate().alpha(0).setDuration(300).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        spinner.setVisibility(View.GONE);
+                    }
+                });
             }
         };
 
-        googleSearchButton.setVisibility(View.GONE);
-        wikipediaSearchButton.setVisibility(View.GONE);
-        definitionView.setVisibility(View.INVISIBLE);
+        definitionContent.setVisibility(View.INVISIBLE);
         fadeIn(spinner);
 
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);

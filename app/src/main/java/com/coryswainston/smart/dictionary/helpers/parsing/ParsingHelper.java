@@ -42,6 +42,7 @@ public class ParsingHelper {
         try {
             SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
 
+            boolean first = true;
             RetrieveEntry retrieveEntry = new Gson().fromJson(s, RetrieveEntry.class);
             List<HeadwordEntry> results  = retrieveEntry.getResults();
             if (results != null) {
@@ -52,6 +53,11 @@ public class ParsingHelper {
                             if (lexicalEntry != null) {
                                 String lexicalCategory = lexicalEntry.getLexicalCategory();
                                 if (lexicalCategory != null) {
+                                    if (first) {
+                                        first = false;
+                                    } else {
+                                        stringBuilder.append('\n');
+                                    }
                                     stringBuilder.append(lexicalCategory.toLowerCase());
                                     stringBuilder.setSpan(new StyleSpan(Typeface.BOLD),
                                             stringBuilder.length() - lexicalCategory.length(),
@@ -74,7 +80,6 @@ public class ParsingHelper {
                                                         stringBuilder.append(String.format("%s. %s%n", definitionNumber, definition));
                                                     }
                                                 }
-                                                stringBuilder.append("\n");
                                             }
                                         }
                                     }
