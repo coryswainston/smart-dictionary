@@ -12,6 +12,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.RadioGroup;
 
 import com.coryswainston.smart.dictionary.R;
+import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
 
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_ES;
@@ -55,10 +56,10 @@ public class SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
         RadioGroup radioGroup = v.findViewById(R.id.radioGroup);
         switch (language) {
-            case "en":
+            case DictionaryLookupService.LANGUAGE_EN:
                 radioGroup.check(R.id.english_radio);
                 break;
-            case "es":
+            case DictionaryLookupService.LANGUAGE_ES:
                 radioGroup.check(R.id.spanish_radio);
                 break;
         }

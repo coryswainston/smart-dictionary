@@ -7,4 +7,10 @@
     <string name="language_instructions">Choose your language</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="en">English</string>
+    <string name="es">Spanish</string>
+    <string name="no_definition">No definition found.</string>
+    <string name="check_internet">Check internet connection.</string>
 </resources>

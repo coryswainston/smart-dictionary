@@ -218,7 +218,7 @@ public class DefinitionsFragment extends Fragment {
         if (titleView.isEnabled()) {
             titleView.setEnabled(false);
 
-            b.setText("edit");
+            b.setText(getContext().getResources().getString(R.string.edit));
             b.setBackground(getResources().getDrawable(R.drawable.rounded_button));
 
             String title = titleView.getText().toString();
@@ -228,7 +228,7 @@ public class DefinitionsFragment extends Fragment {
                 getDefinitionFromCacheOrService(title);
             }
         } else {
-            b.setText("save");
+            b.setText(getContext().getResources().getString(R.string.save));
             b.setBackground(getResources().getDrawable(R.drawable.rounded_button_green));
 
             titleView.setEnabled(true);
@@ -270,13 +270,13 @@ public class DefinitionsFragment extends Fragment {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
                 } catch (ParsingException e) {
                     e.printStackTrace();
-                    definitionsList = new SpannableStringBuilder("No definition found.");
+                    definitionsList = new SpannableStringBuilder(getContext().getResources().getString(R.string.no_definition));
                 }
 
                 if (definitionsList != null) {
                     sharedPreferences.edit().putString(getKey(word), result).apply();
                 } else {
-                    definitionsList = new SpannableStringBuilder("Check Internet connection");
+                    definitionsList = new SpannableStringBuilder(getContext().getResources().getString(R.string.check_internet));
                 }
 
                 definitionView.setText(definitionsList);

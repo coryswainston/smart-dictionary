@@ -98,8 +98,6 @@ public class DefineActivity extends AppCompatActivity
 
     @Override
     public void onTabClick(View v) {
-        Log.d(TAG, "In onTabClick");
-
         definitionsFragment.onTabClick(v);
     }
 
