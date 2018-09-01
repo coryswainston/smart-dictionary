@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Lexiglass</string>
+    <string name="app_name_uppercase" translatable="false">LEXIGLASS</string>
+    <string name="picture_instructions">Mantén presionada una palabra para definirla.</string>
+    <string name="word_instructions">TOCA PARA DEFINIR</string>
+    <string name="capture">Capturar texto</string>
+    <string name="language_instructions">Selecciona un idioma</string>
+    <string name="settings">Configuración</string>
+    <string name="back">Back</string>
+    <string name="edit">Editar</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="en">Inglés</string>
+    <string name="es">Español</string>
+    <string name="no_definition">No se encontró definición.</string>
+    <string name="check_internet">Verifique la conexión a internet.</string>
+    <string name="oxford_link">Más en oxforddictionaries.com→</string>
+</resources>

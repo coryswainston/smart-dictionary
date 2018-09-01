@@ -23,9 +23,6 @@ import static com.coryswainston.smart.dictionary.services.DictionaryLookupServic
 
 public class Settings {
 
-    private static final String OK = "OK";
-    private static final String CANCEL = "CANCEL";
-
     private static final String KEY_LEXIGLASS = "lexiglass";
     private static final String KEY_LANGUAGE = "language";
 
@@ -47,10 +44,11 @@ public class Settings {
         final AlertDialog settingsDialog = new AlertDialog.Builder(activity)
                 .setTitle(selectLanguage)
                 .setView(cl)
-                .setNegativeButton(CANCEL, null)
+                .setNegativeButton(context.getResources().getString(R.string.cancel), null)
                 .create();
 
-        settingsDialog.setButton(DialogInterface.BUTTON_POSITIVE, OK,
+        settingsDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                context.getResources().getString(R.string.ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String language;
