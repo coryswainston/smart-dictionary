@@ -1,6 +1,7 @@
 package com.coryswainston.smart.dictionary.activities;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -10,6 +11,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -18,6 +20,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coryswainston.smart.dictionary.R;
@@ -297,7 +300,23 @@ public class MainActivity
 
         for (int i = 0; i < results.length; i++) {
             if (results[i] != PackageManager.PERMISSION_GRANTED && permissions[i] != null) {
-                Toast.makeText(this, "Need permissions to use camera.", Toast.LENGTH_SHORT).show();
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Permissions needed");
+                alertDialog.setMessage("This app requires camera permissions to function properly.");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[] {
+                                            Manifest.permission.CAMERA,
+                                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                                            Manifest.permission.INTERNET
+                                        },
+                                        0);
+                            }
+                        });
+                alertDialog.show();
                 return;
             }
         }
