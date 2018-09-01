@@ -16,6 +16,7 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,7 @@ public class DefinitionsFragment extends Fragment {
     private LinearLayoutManager layoutManager;
     private List<String> words;
     private String tempTitle;
+    private TextView oxfordLink;
 
     private Button wordsBackButton;
     private Button wordsForwardButton;
@@ -167,6 +169,8 @@ public class DefinitionsFragment extends Fragment {
         wordsForwardButton = v.findViewById(R.id.definitions_words_list_forward);
 
         definitionContent = v.findViewById(R.id.definition_content);
+        oxfordLink = v.findViewById(R.id.oxford_link);
+
 
         addWord(titleView.getText().toString());
 
@@ -265,19 +269,39 @@ public class DefinitionsFragment extends Fragment {
     private void getDefinitionFromCacheOrService(String word) {
         DictionaryLookupService.Callback dictionaryCallback = new DictionaryLookupService.Callback() {
             @Override
-            public void callback(String word, String result) {
+            public void callback(final String word, String result) {
+                boolean defined = true;
                 SpannableStringBuilder definitionsList;
                 try {
                     definitionsList = ParsingHelper.parseDefinitionsFromJson(result);
                 } catch (ParsingException e) {
                     e.printStackTrace();
+                    defined = false;
                     definitionsList = new SpannableStringBuilder(getContext().getResources().getString(R.string.no_definition));
                 }
 
                 if (definitionsList != null) {
                     sharedPreferences.edit().putString(getKey(word), result).apply();
                 } else {
+                    defined = false;
                     definitionsList = new SpannableStringBuilder(getContext().getResources().getString(R.string.check_internet));
+                }
+
+                if (!defined) {
+                    oxfordLink.setVisibility(View.INVISIBLE);
+                } else {
+                    oxfordLink.setVisibility(View.VISIBLE);
+                    oxfordLink.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                            Uri uri = Uri.parse(
+                                    String.format("https://%s.oxforddictionaries.com/definition/%s",
+                                            selectedLanguage, word));
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(intent);
+                        }
+                    });
                 }
 
                 definitionView.setText(definitionsList);

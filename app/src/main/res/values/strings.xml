@@ -13,4 +13,5 @@
     <string name="es">Spanish</string>
     <string name="no_definition">No definition found.</string>
     <string name="check_internet">Check internet connection.</string>
+    <string name="oxford_link">More from oxforddictionaries.com→</string>
 </resources>
