@@ -12,6 +12,8 @@ import android.widget.RadioGroup;
 
 import com.coryswainston.smart.dictionary.R;
 
+import java.util.Locale;
+
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
 import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_ES;
 
@@ -70,6 +72,7 @@ public class Settings {
 
     public static String loadLanguagePreference(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_LEXIGLASS, 0);
-        return sharedPreferences.getString(KEY_LANGUAGE, LANGUAGE_EN);
+        return sharedPreferences.getString(KEY_LANGUAGE,
+                Locale.getDefault().getLanguage().equals(LANGUAGE_ES) ? LANGUAGE_ES : LANGUAGE_EN);
     }
 }
