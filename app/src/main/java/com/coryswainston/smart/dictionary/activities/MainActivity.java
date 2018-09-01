@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -20,13 +19,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
-import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
 import com.coryswainston.smart.dictionary.services.DetectorProcessor;
+import com.coryswainston.smart.dictionary.util.Settings;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -39,13 +37,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
 import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
 
 public class MainActivity
         extends AppCompatActivity
-        implements SettingsFragment.OnFragmentInteractionListener,
-        DefinitionsFragment.OnFragmentInteractionListener {
+        implements DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
 
@@ -57,10 +53,7 @@ public class MainActivity
     private Button defineButton;
     private View loadingGif;
 
-    private SettingsFragment settingsFragment;
     private DefinitionsFragment definitionsFragment;
-
-    private String selectedLanguage;
 
     private String detectedText;
     private List<Text> blocks;
@@ -87,7 +80,6 @@ public class MainActivity
         surfaceAvailable = false;
         surfaceView.getHolder().addCallback(new SurfaceCallback());
 
-        selectedLanguage = LANGUAGE_EN;
     }
 
     private class SurfaceCallback implements SurfaceHolder.Callback {
@@ -230,9 +222,9 @@ public class MainActivity
 
     public void onDefineButtonClick(View v) {
         if (definitionsFragment == null) {
-            definitionsFragment = DefinitionsFragment.newInstance(selectedWord, selectedLanguage);
+            definitionsFragment = DefinitionsFragment.newInstance(selectedWord);
         } else {
-            definitionsFragment.addWord(selectedWord, selectedLanguage);
+            definitionsFragment.addWord(selectedWord);
         }
         definitionsFragment.show(this);
         activeEvent = null;
@@ -439,23 +431,7 @@ public class MainActivity
      * Called when the user hits the settings button.
      */
     public void onSettingsClick(View v) {
-        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-        if (settingsFragment != null) {
-            settingsFragment.remove();
-            settingsFragment = null;
-        } else {
-            settingsFragment = SettingsFragment.newInstance(selectedLanguage);
-            settingsFragment.show(this);
-        }
-    }
-
-    /**
-     * Called when the user hits the 'ok' button in the settings fragment.
-     */
-    @Override
-    public void onSettingsOk(View v) {
-        selectedLanguage = settingsFragment.onSettingsOk();
-        settingsFragment = null;
+        Settings.showDialog(this);
     }
 
     @Override
@@ -478,14 +454,6 @@ public class MainActivity
         definitionsFragment.onWikipediaSearch();
     }
 
-    /**
-     * Called when the user hits the 'cancel' button in the settings fragment.
-     */
-    public void onSettingsCancel(View v) {
-        settingsFragment.remove();
-        settingsFragment = null;
-    }
-
     @Override
     public void onWordsBackOrForward(View v) {
         definitionsFragment.onWordsBackOrForward(v);
@@ -496,9 +464,6 @@ public class MainActivity
         if (definitionsFragment != null) {
             definitionsFragment.remove();
             definitionsFragment = null;
-        } else if (settingsFragment != null) {
-            settingsFragment.remove();
-            settingsFragment = null;
         } else {
             super.onBackPressed();
         }

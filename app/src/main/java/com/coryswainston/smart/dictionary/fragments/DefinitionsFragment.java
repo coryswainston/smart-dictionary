@@ -32,6 +32,7 @@ import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.helpers.parsing.ParsingException;
 import com.coryswainston.smart.dictionary.helpers.parsing.ParsingHelper;
 import com.coryswainston.smart.dictionary.services.DictionaryLookupService;
+import com.coryswainston.smart.dictionary.util.Settings;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -72,12 +73,11 @@ public class DefinitionsFragment extends Fragment {
      *
      * @return A new instance of fragment DefinitionsFragment.
      */
-    public static DefinitionsFragment newInstance(String word, String selectedLanguage) {
+    public static DefinitionsFragment newInstance(String word) {
         DefinitionsFragment definitionsFragment = new DefinitionsFragment();
 
         definitionsFragment.tempTitle = word;
         definitionsFragment.words = new ArrayList<>();
-        definitionsFragment.selectedLanguage = selectedLanguage;
 
         return definitionsFragment;
     }
@@ -95,6 +95,7 @@ public class DefinitionsFragment extends Fragment {
         definitionView = v.findViewById(R.id.definition_text);
         spinner = v.findViewById(R.id.definition_progress_gif);
 
+        selectedLanguage = Settings.loadLanguagePreference(getActivity());
         sharedPreferences = getContext().getSharedPreferences("lexiglass", 0);
 
         titleView = v.findViewById(R.id.definition_word_heading);
@@ -167,7 +168,7 @@ public class DefinitionsFragment extends Fragment {
 
         definitionContent = v.findViewById(R.id.definition_content);
 
-        addWord(titleView.getText().toString(), selectedLanguage);
+        addWord(titleView.getText().toString());
 
         return v;
     }
@@ -293,6 +294,7 @@ public class DefinitionsFragment extends Fragment {
         definitionContent.setVisibility(View.INVISIBLE);
         fadeIn(spinner);
 
+        selectedLanguage = Settings.loadLanguagePreference(getActivity());
         String cachedDefinition = sharedPreferences.getString(getKey(word), null);
         if (cachedDefinition != null) {
             Log.d(TAG, "avoiding API call");
@@ -330,12 +332,11 @@ public class DefinitionsFragment extends Fragment {
         getDefinitionFromCacheOrService(words.get(index));
     }
 
-    public void addWord(String word, String selectedLanguage) {
+    public void addWord(String word) {
         final int wordIndex;
         if (words.contains(word)) {
             wordIndex = words.indexOf(word);
         } else {
-            this.selectedLanguage = selectedLanguage;
             words.add(word);
             recyclerAdapter.notifyDataSetChanged();
             wordIndex = words.size() - 1;
@@ -423,11 +424,6 @@ public class DefinitionsFragment extends Fragment {
     public void show(FragmentActivity activity) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         if (fragmentManager.findFragmentByTag(TAG) == null) {
-            SettingsFragment settingsFragment = (SettingsFragment)fragmentManager.findFragmentByTag(SettingsFragment.TAG);
-            if (settingsFragment != null) {
-                settingsFragment.remove();
-            }
-
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
                     .add(R.id.define_container, this, TAG)

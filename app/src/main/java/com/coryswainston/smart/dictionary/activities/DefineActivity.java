@@ -3,45 +3,35 @@ package com.coryswainston.smart.dictionary.activities;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.TextView;
 
 import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
-import com.coryswainston.smart.dictionary.fragments.SettingsFragment;
 import com.coryswainston.smart.dictionary.listeners.WordGrabber;
-
-import static com.coryswainston.smart.dictionary.services.DictionaryLookupService.LANGUAGE_EN;
+import com.coryswainston.smart.dictionary.util.Settings;
 
 public class DefineActivity extends AppCompatActivity
-        implements SettingsFragment.OnFragmentInteractionListener,
-        DefinitionsFragment.OnFragmentInteractionListener {
+        implements DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "DefineActivity";
 
     private TextView detectedWords;
     private DefinitionsFragment definitionsFragment;
-    private SettingsFragment settingsFragment;
-
-    private String selectedLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_define);
 
-        selectedLanguage = LANGUAGE_EN;
-
         detectedWords = findViewById(R.id.detect_view);
         detectedWords.setOnTouchListener(new WordGrabber(new WordGrabber.Callback() {
             @Override
             public void callback(String text) {
                 if (definitionsFragment == null) {
-                    definitionsFragment = DefinitionsFragment.newInstance(text, selectedLanguage);
+                    definitionsFragment = DefinitionsFragment.newInstance(text);
                 } else {
-                    definitionsFragment.addWord(text, selectedLanguage);
+                    definitionsFragment.addWord(text);
                 }
                 definitionsFragment.show(DefineActivity.this);
             }
@@ -55,7 +45,6 @@ public class DefineActivity extends AppCompatActivity
      * Called when the user hits the back button.
      */
     public void onBack(View v) {
-        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         onBackPressed();
     }
 
@@ -73,22 +62,7 @@ public class DefineActivity extends AppCompatActivity
      * Called when the user hits the settings button.
      */
     public void onSettingsClick(View v) {
-        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-        if (settingsFragment == null) {
-            settingsFragment = SettingsFragment.newInstance(selectedLanguage);
-            settingsFragment.show(this);
-        } else {
-            settingsFragment.remove();
-            settingsFragment = null;
-        }
-    }
-
-    /**
-     * Called when the user hits the 'ok' button in the settings fragment.
-     */
-    @Override
-    public void onSettingsOk(View v) {
-        selectedLanguage = settingsFragment.onSettingsOk();
+        Settings.showDialog(this);
     }
 
     @Override
@@ -109,14 +83,6 @@ public class DefineActivity extends AppCompatActivity
     @Override
     public void onWikipediaSearch(View v) {
         definitionsFragment.onWikipediaSearch();
-    }
-
-    /**
-     * Called when the user hits the 'cancel' button in the settings fragment.
-     */
-    public void onSettingsCancel(View v) {
-        settingsFragment.remove();
-        settingsFragment = null;
     }
 
     @Override
