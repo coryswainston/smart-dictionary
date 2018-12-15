@@ -37,12 +37,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/define_button_bg"
-            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawableLeft="@drawable/material_search"
             android:drawablePadding="5dp"
             android:fontFamily="@font/montserrat"
             android:onClick="onDefineButtonClick"
-            android:scaleX="0"
-            android:scaleY="0"
             android:textColor="@color/colorPrimary"
             android:textSize="26dp"
             android:visibility="visible"
@@ -124,11 +122,10 @@
 
         <SurfaceView
             android:id="@+id/surfaceView"
-            android:layout_width="320dp"
-            android:layout_height="320dp"
-            android:background="@drawable/rounded_surface"
-            android:fontFamily="@font/open_sans_light"
-            android:isScrollContainer="false"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="24dp"
             android:scrollbars="vertical"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/black"
@@ -137,24 +134,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/instruction_main" />
     </android.support.constraint.ConstraintLayout>
-
-    <FrameLayout
-        android:id="@+id/settings_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="80dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="80dp"
-        android:clickable="false"
-        android:elevation="12dp"
-        android:translationZ="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/define_container"
