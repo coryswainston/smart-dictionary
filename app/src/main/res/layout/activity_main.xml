@@ -16,6 +16,38 @@
         android:layout_height="match_parent"
         android:background="#fff">
 
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/button_box"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:background="@android:color/white"
+            android:elevation="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/wrapper"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/wrapper">
+
+            <Button
+                android:id="@+id/capture_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/montserrat_bold"
+                android:hapticFeedbackEnabled="true"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="@string/capture"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+
         <TextView
             android:id="@+id/instruction_main"
             android:layout_width="0dp"
@@ -62,25 +94,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/capture_button"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginBottom="32dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/rounded_button"
-            android:fontFamily="@font/montserrat_bold"
-            android:hapticFeedbackEnabled="true"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            android:text="@string/capture"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <TextView
             android:id="@+id/main_title"
             android:layout_width="wrap_content"
@@ -124,15 +137,16 @@
             android:id="@+id/surfaceView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginTop="24dp"
             android:scrollbars="vertical"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/black"
-            app:layout_constraintBottom_toTopOf="@+id/capture_button"
+            app:layout_constraintBottom_toTopOf="@+id/button_box"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/instruction_main" />
+
     </android.support.constraint.ConstraintLayout>
 
     <FrameLayout

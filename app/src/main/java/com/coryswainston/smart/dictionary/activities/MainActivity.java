@@ -5,9 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -18,12 +21,14 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.coryswainston.smart.dictionary.R;
 import com.coryswainston.smart.dictionary.fragments.DefinitionsFragment;
 import com.coryswainston.smart.dictionary.services.DetectorProcessor;
+import com.coryswainston.smart.dictionary.util.CameraUtils;
 import com.coryswainston.smart.dictionary.util.Settings;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -37,6 +42,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.coryswainston.smart.dictionary.util.CameraUtils.selectSizePair;
 import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
 
 public class MainActivity
@@ -44,6 +50,10 @@ public class MainActivity
         implements DefinitionsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
+    private boolean requested = false;
+
+    private static final int DESIRED_WIDTH = 1200;
+    private static final int DESIRED_HEIGHT = 1200;
 
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
@@ -52,6 +62,7 @@ public class MainActivity
     private Button captureButton;
     private Button defineButton;
     private View loadingGif;
+    private ConstraintLayout wrapper;
 
     private DefinitionsFragment definitionsFragment;
 
@@ -69,6 +80,7 @@ public class MainActivity
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
+        wrapper = findViewById(R.id.wrapper);
         captureButton = findViewById(R.id.capture_button);
         defineButton = findViewById(R.id.define_button);
         defineButton.setScaleX(0);
@@ -78,26 +90,58 @@ public class MainActivity
         loadingGif.setVisibility(View.GONE);
 
         surfaceAvailable = false;
-        surfaceView.getHolder().addCallback(new SurfaceCallback());
+        if (checkForPermissions(Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET)) {
+            surfaceView.getHolder().addCallback(new SurfaceCallback());
+        }
+    }
 
+    private void adjustPreviewSize() {
+        // determine what the camera size will be
+        try {
+            Camera testInstance = Camera.open();
+            CameraUtils.SizePair sizePair = CameraUtils.selectSizePair(testInstance, DESIRED_WIDTH, DESIRED_HEIGHT);
+
+            int adjustedWidth = sizePair.previewSize().getWidth();
+            int adjustedHeight = sizePair.previewSize().getHeight();
+
+            testInstance.release();
+
+            // manually change surfaceView to fit camera size
+            surfaceView.setLayoutParams(new ConstraintLayout.LayoutParams(adjustedWidth, adjustedHeight));
+
+            int height = surfaceView.getHeight();
+            int width = surfaceView.getWidth();
+
+            ratio = adjustedHeight / height;
+
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(wrapper);
+
+            constraintSet.connect(R.id.surfaceView,ConstraintSet.LEFT,R.id.wrapper,ConstraintSet.LEFT,0);
+//        constraintSet.connect(R.id.surfaceView,ConstraintSet.RIGHT,R.id.wrapper,ConstraintSet.RIGHT,0);
+            constraintSet.connect(R.id.surfaceView,ConstraintSet.TOP,R.id.instruction_main,ConstraintSet.BOTTOM,24);
+//        constraintSet.connect(R.id.surfaceView,ConstraintSet.BOTTOM,R.id.capture_button,ConstraintSet.TOP,24);
+            constraintSet.applyTo(wrapper);
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
     }
 
     private class SurfaceCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(final SurfaceHolder surfaceHolder) {
             surfaceAvailable = true;
-            if (checkForPermissions(Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.INTERNET)) {
-                try {
-                    setUpCamera();
-                }
-                catch (SecurityException e) {
-                    Log.e("surfaceCallback", e.toString());
-                }
-                catch (IOException e) {
-                    Log.e("surfaceCallback", e.toString());
-                }
+            adjustPreviewSize();
+            try {
+                setUpCamera();
+            }
+            catch (SecurityException e) {
+                Log.e("surfaceCallback", e.toString());
+            }
+            catch (IOException e) {
+                Log.e("surfaceCallback", e.toString());
             }
 
             View.OnClickListener captureText = new View.OnClickListener() {
@@ -268,17 +312,19 @@ public class MainActivity
     }
 
     private boolean checkForPermissions(String ... permissions) {
-        List<String> permissionsToRequest = new ArrayList<>(Arrays.asList(permissions));
+        List<String> permissionsToRequest = new ArrayList<>();
 
-        for (Iterator<String> it = permissionsToRequest.iterator(); it.hasNext();) {
-            if (ContextCompat.checkSelfPermission(this, it.next()) == PackageManager.PERMISSION_GRANTED) {
-                it.remove();
+        for (String permission: permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
             }
         }
         if (permissionsToRequest.isEmpty()) {
             return true;
         }
-        ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(permissions), 0);
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                permissionsToRequest.toArray(new String[permissionsToRequest.size()]), 0);
         return false;
     }
 
@@ -312,17 +358,7 @@ public class MainActivity
                 return;
             }
         }
-
-        try {
-            setUpCamera();
-        }
-        catch (SecurityException e) {
-            Log.e("surfaceCallback", e.toString());
-        }
-        catch (IOException e) {
-            Log.e("surfaceCallback", e.toString());
-        }
-
+        surfaceView.getHolder().addCallback(new SurfaceCallback());
     }
 
     private void setUpCamera() throws IOException, SecurityException {
@@ -346,18 +382,11 @@ public class MainActivity
         cameraSource = new CameraSource.Builder(this, recognizer)
                 .setFacing(CAMERA_FACING_BACK)
                 .setRequestedFps(0.1f)
-                .setRequestedPreviewSize(1200, 1200) // TODO most cameras won't have square ratios. Will need to find a hack
+                .setRequestedPreviewSize(DESIRED_WIDTH, DESIRED_HEIGHT)
                 .setAutoFocusEnabled(true)
                 .build();
 
         startCameraSource();
-
-        float cameraHeight = cameraSource.getPreviewSize().getHeight();
-        float previewHeight = surfaceView.getHeight();
-
-        Log.d(TAG, "camera height: " + cameraHeight + ", preview height: " + previewHeight);
-        ratio = cameraHeight / previewHeight;
-        Log.d(TAG, "ratio is: " + ratio);
     }
 
     private void startCameraSource() throws IOException, SecurityException {
