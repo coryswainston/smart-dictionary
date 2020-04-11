@@ -4,7 +4,9 @@ import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
+import android.util.Log;
 
+import com.coryswainston.smart.dictionary.schema.LexicalCategory;
 import com.coryswainston.smart.dictionary.schema.entry.Entry;
 import com.coryswainston.smart.dictionary.schema.entry.HeadwordEntry;
 import com.coryswainston.smart.dictionary.schema.entry.LexicalEntry;
@@ -39,6 +41,8 @@ public class ParsingHelper {
             return null;
         }
 
+        Log.e("THIS IS IT", s);
+
         try {
             SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
 
@@ -51,7 +55,7 @@ public class ParsingHelper {
                         List<LexicalEntry> lexicalEntries = result.getLexicalEntries();
                         for (LexicalEntry lexicalEntry : lexicalEntries) {
                             if (lexicalEntry != null) {
-                                String lexicalCategory = lexicalEntry.getLexicalCategory();
+                                String lexicalCategory = lexicalEntry.getLexicalCategory().getText();
                                 if (lexicalCategory != null) {
                                     if (first) {
                                         first = false;

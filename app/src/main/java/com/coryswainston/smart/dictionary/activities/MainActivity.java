@@ -70,7 +70,7 @@ public class MainActivity
     private List<Text> blocks;
     private String selectedWord;
     private MotionEvent activeEvent;
-    private float ratio;
+    private float ratio = 0.9f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,30 +100,27 @@ public class MainActivity
     private void adjustPreviewSize() {
         // determine what the camera size will be
         try {
-            Camera testInstance = Camera.open();
-            CameraUtils.SizePair sizePair = CameraUtils.selectSizePair(testInstance, DESIRED_WIDTH, DESIRED_HEIGHT);
-
-            int adjustedWidth = sizePair.previewSize().getWidth();
-            int adjustedHeight = sizePair.previewSize().getHeight();
-
-            testInstance.release();
-
-            // manually change surfaceView to fit camera size
-            surfaceView.setLayoutParams(new ConstraintLayout.LayoutParams(adjustedWidth, adjustedHeight));
-
-            int height = surfaceView.getHeight();
-            int width = surfaceView.getWidth();
-
-            ratio = adjustedHeight / height;
-
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintSet.clone(wrapper);
-
-            constraintSet.connect(R.id.surfaceView,ConstraintSet.LEFT,R.id.wrapper,ConstraintSet.LEFT,0);
-//        constraintSet.connect(R.id.surfaceView,ConstraintSet.RIGHT,R.id.wrapper,ConstraintSet.RIGHT,0);
-            constraintSet.connect(R.id.surfaceView,ConstraintSet.TOP,R.id.instruction_main,ConstraintSet.BOTTOM,24);
-//        constraintSet.connect(R.id.surfaceView,ConstraintSet.BOTTOM,R.id.capture_button,ConstraintSet.TOP,24);
-            constraintSet.applyTo(wrapper);
+//            Camera testInstance = Camera.open();
+//            CameraUtils.SizePair sizePair = CameraUtils.selectSizePair(testInstance, DESIRED_WIDTH, DESIRED_HEIGHT);
+//
+//            int adjustedWidth = sizePair.previewSize().getWidth();
+//            int adjustedHeight = sizePair.previewSize().getHeight();
+//
+//            testInstance.release();
+//
+//            // manually change surfaceView to fit camera size
+//            surfaceView.setLayoutParams(new ConstraintLayout.LayoutParams(adjustedWidth, adjustedHeight));
+//
+//            int height = surfaceView.getHeight();
+//
+//            ratio = adjustedHeight / height;
+//
+//            ConstraintSet constraintSet = new ConstraintSet();
+//            constraintSet.clone(wrapper);
+//
+//            constraintSet.connect(R.id.surfaceView,ConstraintSet.LEFT,R.id.wrapper,ConstraintSet.LEFT,0);
+//            constraintSet.connect(R.id.surfaceView,ConstraintSet.TOP,R.id.instruction_main,ConstraintSet.BOTTOM,24);
+//            constraintSet.applyTo(wrapper);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }

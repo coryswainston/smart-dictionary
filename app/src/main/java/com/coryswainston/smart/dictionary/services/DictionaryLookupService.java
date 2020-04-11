@@ -28,9 +28,9 @@ public class DictionaryLookupService extends AsyncTask<String, Integer, String> 
 
     public static final String NO_INTERNET_ERROR = "no_internet";
 
-    private static final String BASE_URL = "https://od-api.oxforddictionaries.com:443/api/v1";
+    private static final String BASE_URL = "https://od-api.oxforddictionaries.com/api/v2";
     private static final String ENTRIES = "entries";
-    private static final String INFLECTIONS = "inflections";
+    private static final String INFLECTIONS = "lemmas";
     private String language;
     private String wordToLookup;
 

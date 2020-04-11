@@ -1,6 +1,7 @@
 package com.coryswainston.smart.dictionary.schema.inflection;
 
 import com.coryswainston.smart.dictionary.schema.GrammaticalFeature;
+import com.coryswainston.smart.dictionary.schema.LexicalCategory;
 
 import java.util.List;
 
@@ -8,7 +9,7 @@ public class LemmatronLexicalEntry {
     private List<GrammaticalFeature> grammaticalFeatures;
     private List<Inflection> inflectionOf;
     private String language;
-    private String lexicalCategory;
+    private LexicalCategory lexicalCategory;
     private String text;
 
     public List<GrammaticalFeature> getGrammaticalFeatures() {
@@ -35,11 +36,11 @@ public class LemmatronLexicalEntry {
         this.language = language;
     }
 
-    public String getLexicalCategory() {
+    public LexicalCategory getLexicalCategory() {
         return lexicalCategory;
     }
 
-    public void setLexicalCategory(String lexicalCategory) {
+    public void setLexicalCategory(LexicalCategory lexicalCategory) {
         this.lexicalCategory = lexicalCategory;
     }
 

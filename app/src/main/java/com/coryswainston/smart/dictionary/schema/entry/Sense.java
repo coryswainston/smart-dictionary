@@ -1,18 +1,21 @@
 package com.coryswainston.smart.dictionary.schema.entry;
 
+import com.coryswainston.smart.dictionary.schema.Domain;
+import com.coryswainston.smart.dictionary.schema.Register;
+
 import java.util.List;
 
 public class Sense {
     private List<String> crossReferenceMarkers;
     private List<CrossReference> crossReferences;
     private List<String> definitions;
-    private List<String> domains;
+    private List<Domain> domains;
     private List<Example> examples;
     private String id;
     private List<CategorizedText> notes;
     private List<Pronunciation> pronunciations;
     private List<String> regions;
-    private List<String> registers;
+    private List<Register> registers;
     private List<String> shortDefinitions;
     private List<Sense> subsenses;
     private List<ThesaurusLink> thesaurusLinks;
@@ -43,11 +46,11 @@ public class Sense {
         this.definitions = definitions;
     }
 
-    public List<String> getDomains() {
+    public List<Domain> getDomains() {
         return domains;
     }
 
-    public void setDomains(List<String> domains) {
+    public void setDomains(List<Domain> domains) {
         this.domains = domains;
     }
 
@@ -91,11 +94,11 @@ public class Sense {
         this.regions = regions;
     }
 
-    public List<String> getRegisters() {
+    public List<Register> getRegisters() {
         return registers;
     }
 
-    public void setRegisters(List<String> registers) {
+    public void setRegisters(List<Register> registers) {
         this.registers = registers;
     }
 

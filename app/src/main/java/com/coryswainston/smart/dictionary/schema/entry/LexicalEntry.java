@@ -1,6 +1,7 @@
 package com.coryswainston.smart.dictionary.schema.entry;
 
 import com.coryswainston.smart.dictionary.schema.GrammaticalFeature;
+import com.coryswainston.smart.dictionary.schema.LexicalCategory;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class LexicalEntry {
     private List<Entry> entries;
     private List<GrammaticalFeature> grammaticalFeatures;
     private String language;
-    private String lexicalCategory;
+    private LexicalCategory lexicalCategory;
     private List<CategorizedText> notes;
     private List<Pronunciation> pronunciations;
     private String text;
@@ -56,11 +57,11 @@ public class LexicalEntry {
         this.language = language;
     }
 
-    public String getLexicalCategory() {
+    public LexicalCategory getLexicalCategory() {
         return lexicalCategory;
     }
 
-    public void setLexicalCategory(String lexicalCategory) {
+    public void setLexicalCategory(LexicalCategory lexicalCategory) {
         this.lexicalCategory = lexicalCategory;
     }
 
