@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">Lexiglass</string>
-    <string name="app_name_uppercase" translatable="false">LEXIGLASS</string>
+    <string name="app_name" translatable="false">Smart Dictionary</string>
+    <string name="app_name_uppercase" translatable="false">SMART DICTIONARY</string>
     <string name="picture_instructions">Press and hold on any word to define it.</string>
     <string name="word_instructions">TAP A WORD TO DEFINE</string>
-    <string name="capture">Capture text</string>
+    <string name="capture">All Text</string>
     <string name="language_instructions">Choose your language</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>

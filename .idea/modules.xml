@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Projects-smart-dictionary.iml" filepath="$PROJECT_DIR$/Projects-smart-dictionary.iml" group="smart-dictionary" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/smart-dictionary.iml" filepath="$PROJECT_DIR$/smart-dictionary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/smart-dictionary-app.iml" filepath="$PROJECT_DIR$/app/smart-dictionary-app.iml" group="smart-dictionary/app" />
     </modules>
   </component>
 </project>
